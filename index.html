@@ -1,0 +1,4940 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHW1A Project Milestone Timeline</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+      :root {
+        --bg: #ffffff;
+        --ink: #151a21;
+        --muted: #5b6470;
+        --line: #dadfe5;
+        --p1: #1f5fa8;
+        --p2: #b5690a;
+        --done: #2e8b57;
+        --today: #7a3fc2;
+        --delay: #c0392b;
+        --ahead: #2e8b57;
+        --neutral: #5b6470;
+        --card-bg: #f7f8fa;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Inter", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+      .wrap.report-wrap {
+        max-width: 1440px;
+      }
+
+      /* ---- Tab navigation ---- */
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+      }
+
+      .tabbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .tabbar-inner {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        gap: 4px;
+      }
+      .tab-btn {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 15px 18px 12px;
+        cursor: pointer;
+      }
+      .tab-btn:hover {
+        color: var(--p1);
+      }
+      .tab-btn.active {
+        color: var(--ink);
+        border-bottom-color: var(--p1);
+      }
+
+      .today-control {
+        position: sticky;
+        top: 47px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: var(--today);
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 24px;
+      }
+      .today-control-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      .today-date-input {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 5px;
+        padding: 4px 6px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .today-control-badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-left: auto;
+        white-space: nowrap;
+      }
+      .sync-badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 4px 10px 4px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+      }
+      .sync-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #9aa3ae;
+        flex: none;
+      }
+      .sync-badge[data-state="connecting"] .dot {
+        background: #ffd166;
+        animation: sync-pulse 1s infinite ease-in-out;
+      }
+      .sync-badge[data-state="saving"] .dot {
+        background: #ffd166;
+        animation: sync-pulse 0.7s infinite ease-in-out;
+      }
+      .sync-badge[data-state="synced"] .dot {
+        background: #6ee7a0;
+      }
+      .sync-badge[data-state="offline"] .dot {
+        background: rgba(255, 255, 255, 0.5);
+      }
+      .sync-badge[data-state="error"] .dot {
+        background: #ff8a80;
+      }
+      @keyframes sync-pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+      .edit-lock-btn {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 999px;
+        padding: 5px 12px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .edit-lock-btn:hover {
+        background: rgba(255, 255, 255, 0.24);
+      }
+      .edit-lock-btn.unlocked {
+        background: #eaf6ef;
+        color: var(--done);
+        border-color: var(--done);
+      }
+      .view-only-banner {
+        display: none;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+        background: var(--card-bg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 8px 14px;
+        margin: 0 0 20px;
+      }
+      body.locked-view .view-only-banner {
+        display: block;
+      }
+      body.locked-view input:disabled,
+      body.locked-view .baseline-input:disabled,
+      body.locked-view .forecast-input:disabled,
+      body.locked-view .completed-input:disabled,
+      body.locked-view .progress-input:disabled {
+        color: #9aa3ae;
+        cursor: not-allowed;
+        opacity: 1;
+      }
+      body.locked-view .checkbox-wrap input:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+      body.locked-view #resetBtn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .editable-text {
+        outline: none;
+        border-radius: 4px;
+        transition: box-shadow 0.1s ease;
+      }
+      body:not(.locked-view) .editable-text:hover {
+        box-shadow: 0 0 0 1px var(--line);
+        background: rgba(31, 95, 168, 0.04);
+        cursor: text;
+      }
+      body:not(.locked-view) .editable-text:focus {
+        box-shadow: 0 0 0 2px var(--p1);
+        background: #fff;
+      }
+
+      header {
+        margin-bottom: 32px;
+        border-bottom: 2px solid var(--ink);
+        padding-bottom: 20px;
+      }
+      .eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--p1);
+        margin-bottom: 8px;
+      }
+      h1 {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        font-size: clamp(34px, 7vw, 50px);
+        letter-spacing: 1px;
+        line-height: 1;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 580px;
+        line-height: 1.5;
+      }
+      .hint {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        color: var(--p1);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .stats {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .stat {
+        padding: 14px 16px;
+        border-right: 1px solid var(--line);
+        background: var(--card-bg);
+      }
+      .stat:last-child {
+        border-right: none;
+        background: #fff2f2;
+      }
+      .stat .n {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--ink);
+      }
+      .stat .n.delay {
+        color: var(--delay);
+      }
+      .stat .n.ahead {
+        color: var(--ahead);
+      }
+      .stat .l {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-top: 2px;
+      }
+
+      .progress-track {
+        margin-top: 12px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--line);
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: var(--done);
+        width: 60%;
+        transition: width 0.2s ease;
+      }
+      .progress-cap {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 30px 0 18px;
+        flex-wrap: wrap;
+      }
+      .filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip,
+      .tool-btn {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        padding: 7px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        background: #fff;
+      }
+      .chip:hover,
+      .tool-btn:hover {
+        border-color: var(--p1);
+        color: var(--p1);
+      }
+      .chip.active {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .tool-group {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+        flex-wrap: wrap;
+      }
+      .tool-btn-primary {
+        background: var(--p1);
+        border-color: var(--p1);
+        color: #fff;
+        font-weight: 600;
+      }
+      .tool-btn-primary:hover {
+        background: #184a85;
+        border-color: #184a85;
+        color: #fff;
+      }
+
+      /* ---- Add-milestone modal ---- */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(21, 26, 33, 0.5);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal-box {
+        background: #fff;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 460px;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 22px 24px 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+      }
+      .modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .modal-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        font-size: 22px;
+        text-transform: uppercase;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+        margin: 0 0 4px;
+      }
+      .modal-sub {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .modal-x {
+        border: none;
+        background: none;
+        color: var(--muted);
+        font-size: 16px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px;
+        flex-shrink: 0;
+      }
+      .modal-x:hover {
+        color: var(--ink);
+      }
+      .form-field {
+        margin-bottom: 14px;
+      }
+      .form-field label {
+        display: block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 5px;
+      }
+      .form-field input[type="text"],
+      .form-field input[type="date"],
+      .form-field select,
+      .form-field textarea {
+        width: 100%;
+        font-family: "Inter", sans-serif;
+        font-size: 13.5px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 8px 10px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .form-field textarea {
+        resize: vertical;
+        min-height: 60px;
+        font-family: "Inter", sans-serif;
+        line-height: 1.4;
+      }
+      .form-field input:focus,
+      .form-field select:focus,
+      .form-field textarea:focus {
+        outline: 2px solid var(--p1);
+        outline-offset: 1px;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .modal-btn {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 9px 18px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--muted);
+      }
+      .modal-btn:hover {
+        border-color: var(--p1);
+        color: var(--p1);
+      }
+      .modal-btn.primary {
+        background: var(--p1);
+        border-color: var(--p1);
+        color: #fff;
+      }
+      .modal-btn.primary:hover {
+        background: #184a85;
+        border-color: #184a85;
+        color: #fff;
+      }
+      body.locked-view #addMilestoneBtn {
+        display: none;
+      }
+
+      .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin: 0 0 24px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .sw {
+        width: 12px;
+        height: 3px;
+        border-radius: 2px;
+        display: inline-block;
+      }
+
+      .timeline {
+        position: relative;
+        padding-left: 28px;
+      }
+      .spine {
+        position: absolute;
+        left: 6px;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background: var(--line);
+      }
+
+      .node {
+        position: relative;
+        padding-bottom: 20px;
+      }
+      .node:last-child {
+        padding-bottom: 0;
+      }
+
+      .marker {
+        position: absolute;
+        left: -28px;
+        top: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--muted);
+      }
+      .marker.p1 {
+        border-color: var(--p1);
+      }
+      .marker.p2 {
+        border-color: var(--p2);
+      }
+      .marker.done {
+        background: var(--done);
+        border-color: var(--done);
+      }
+
+      .gap-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+        color: var(--muted);
+        margin: 4px 0 12px 2px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        background: var(--card-bg);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        cursor: pointer;
+        flex-wrap: wrap;
+      }
+      .checkbox-wrap {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .checkbox-wrap input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--done);
+        cursor: pointer;
+      }
+      .header-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--ink);
+        margin-right: auto;
+        min-width: 140px;
+      }
+      .header-date {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .status {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .status.done {
+        color: var(--done);
+        border-color: var(--done);
+        background: #eaf6ef;
+      }
+      .header-variance {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: #eef0f2;
+        color: var(--neutral);
+        white-space: nowrap;
+      }
+      .header-variance.delay {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      .header-variance.ahead {
+        background: #eaf6ef;
+        color: var(--ahead);
+      }
+      .chevron {
+        font-size: 12px;
+        color: var(--muted);
+        transition: transform 0.15s ease;
+        flex-shrink: 0;
+      }
+      .card.open .chevron {
+        transform: rotate(90deg);
+      }
+      .delete-btn {
+        border: none;
+        background: none;
+        color: var(--muted);
+        font-size: 13px;
+        cursor: pointer;
+        padding: 3px 5px;
+        line-height: 1;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      .delete-btn:hover {
+        color: var(--delay);
+        background: #fbeae8;
+      }
+      body.locked-view .delete-btn {
+        display: none;
+      }
+
+      .card-body {
+        display: none;
+        padding: 0 14px 16px;
+      }
+      .card.open .card-body {
+        display: block;
+      }
+
+      .desc {
+        font-size: 13.5px;
+        color: var(--muted);
+        line-height: 1.45;
+        margin: 0 0 12px;
+      }
+
+      .date-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .date-field label {
+        display: block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+      }
+      .baseline-input,
+      .forecast-input,
+      .completed-input {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 4px 6px;
+        width: 100%;
+        background: #fff;
+      }
+      .baseline-input {
+        color: var(--ink);
+      }
+      .forecast-input {
+        color: var(--p1);
+      }
+      .completed-input {
+        color: var(--done);
+      }
+      .baseline-input:focus,
+      .forecast-input:focus,
+      .completed-input:focus {
+        outline: 2px solid var(--p1);
+        outline-offset: 1px;
+      }
+      .variance {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 9px;
+        border-radius: 5px;
+        white-space: nowrap;
+        text-align: center;
+        background: #eef0f2;
+        color: var(--neutral);
+      }
+      .variance.delay {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      .variance.ahead {
+        background: #eaf6ef;
+        color: var(--ahead);
+      }
+
+      .completed-row {
+        display: none;
+        align-items: end;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid var(--done);
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .completed-row.show {
+        display: flex;
+      }
+      .completed-row .date-field {
+        flex: 1;
+      }
+      .completed-tag {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        color: var(--done);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .meta {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        color: #8b94a0;
+      }
+      .meta b {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* ---- Progress ---- */
+      .header-progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .header-progress-track {
+        width: 34px;
+        height: 5px;
+        border-radius: 999px;
+        background: #e4e7eb;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .header-progress-fill {
+        height: 100%;
+        background: var(--delay);
+        width: 0%;
+      }
+      .header-progress-fill.complete {
+        background: var(--done);
+      }
+      .header-progress-text {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--muted);
+        min-width: 28px;
+        text-align: right;
+        white-space: nowrap;
+      }
+      .progress-row {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .progress-row-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .progress-row-top label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .progress-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .progress-input {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 4px 6px;
+        width: 54px;
+        text-align: right;
+        background: #fff;
+        color: var(--ink);
+      }
+      .progress-input:focus {
+        outline: 2px solid var(--p1);
+        outline-offset: 1px;
+      }
+      .progress-pct-suffix {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .progress-track {
+        height: 6px;
+        border-radius: 999px;
+        background: #eef0f2;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--p1);
+        width: 0%;
+        transition: width 0.15s ease;
+      }
+      .progress-fill.complete {
+        background: var(--done);
+      }
+      .progress-auto-note {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      .today-row {
+        position: relative;
+        margin: 2px 0 22px -28px;
+        padding-left: 28px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .today-line {
+        flex: 1;
+        height: 1px;
+        background: var(--today);
+      }
+      .today-pill {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--today);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .phase-header {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--p1);
+        margin: 32px 0 12px -28px;
+        padding-left: 28px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 8px;
+      }
+      .phase-header.p2 {
+        color: var(--p2);
+      }
+
+      .overall-card {
+        margin-top: 32px;
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        background: var(--card-bg);
+        padding: 18px;
+      }
+      .overall-card .title {
+        color: var(--ink);
+        margin-top: 0;
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        text-transform: uppercase;
+      }
+      .overall-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 14px;
+        margin-top: 10px;
+        align-items: end;
+      }
+      .overall-grid label {
+        display: block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+      }
+      .overall-grid .n {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 19px;
+      }
+      #overallVariance {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 5px;
+        text-align: center;
+        background: #eef0f2;
+        color: var(--neutral);
+      }
+      #overallVariance.delay {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      #overallVariance.ahead {
+        background: #eaf6ef;
+        color: var(--ahead);
+      }
+
+      footer {
+        margin-top: 40px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10.5px;
+        color: #9aa3ae;
+        line-height: 1.6;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+
+      /* ---- Executive Report ---- */
+      .report-section {
+        margin-top: 0;
+        padding-top: 0;
+      }
+      .report-topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+      .report-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .report-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: var(--p1);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        flex-shrink: 0;
+      }
+      .report-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        font-size: 26px;
+        color: var(--ink);
+        text-transform: uppercase;
+        margin: 0;
+      }
+      .report-subtitle {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 4px 0 0 44px;
+      }
+      .report-live {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--p1);
+        border: 1px solid var(--p1);
+        border-radius: 999px;
+        padding: 6px 14px;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .report-live .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--p1);
+        animation: pulse 1.6s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      .report-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .report-stat {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 16px;
+      }
+      .report-stat-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      .report-stat-icon.ok {
+        background: #eaf6ef;
+        color: var(--done);
+      }
+      .report-stat-icon.warn {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      .report-stat-icon.flag {
+        background: #f7e7ef;
+        color: #b5306e;
+      }
+      .report-stat-icon.info {
+        background: #eaf0fa;
+        color: var(--p1);
+      }
+      .report-stat-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .report-stat-value {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 19px;
+        color: var(--ink);
+        margin-top: 2px;
+      }
+      .report-stat-value .accent {
+        color: var(--delay);
+      }
+
+      /* ---- Overall (dynamic, filter-aware) ---- */
+      .report-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .report-overall {
+        margin-bottom: 28px;
+      }
+      .report-overall-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        font-size: 15px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin: 0 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .report-overall-title .rof-scope {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--p1);
+        background: #eaf0fa;
+        padding: 3px 9px;
+        border-radius: 999px;
+        text-transform: none;
+      }
+
+      /* ---- Category sections (Completed / Access & Network / Completion / Baseline) ---- */
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+      .report-group {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        min-height: 60px;
+      }
+      .report-group-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      .report-group-header .rg-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .report-group-header .rg-count {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .report-group.group-core .rg-title {
+        color: var(--done);
+      }
+      .report-group.group-core .rg-count {
+        background: #eaf6ef;
+        color: var(--done);
+      }
+      .report-group.group-p1access .rg-title {
+        color: var(--delay);
+      }
+      .report-group.group-p1access .rg-count {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      .report-group.group-p1completion .rg-title {
+        color: #b5306e;
+      }
+      .report-group.group-p1completion .rg-count {
+        background: #f7e7ef;
+        color: #b5306e;
+      }
+      .report-group.group-p2baseline .rg-title {
+        color: var(--p1);
+      }
+      .report-group.group-p2baseline .rg-count {
+        background: #eaf0fa;
+        color: var(--p1);
+      }
+
+      .report-grid-empty {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 6px 2px;
+      }
+
+      .report-card {
+        border-left: 3px solid var(--line);
+        background: var(--card-bg);
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .report-card:last-child {
+        margin-bottom: 0;
+      }
+      .group-core .report-card {
+        border-left-color: var(--done);
+      }
+      .group-p1access .report-card {
+        border-left-color: var(--delay);
+      }
+      .group-p1completion .report-card {
+        border-left-color: #b5306e;
+      }
+      .group-p2baseline .report-card {
+        border-left-color: var(--p1);
+      }
+      .report-card.is-complete {
+        border-left-color: var(--done);
+        background: #f2faf5;
+      }
+
+      .report-card-complete-tag {
+        align-self: flex-start;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--done);
+        background: #eaf6ef;
+        padding: 2px 8px;
+        border-radius: 4px;
+        order: -1;
+      }
+
+      .report-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .report-card-code {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        background: #eef0f2;
+        padding: 2px 7px;
+        border-radius: 4px;
+      }
+      .report-card-badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9.5px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+      .report-card-badge.done {
+        background: #eaf6ef;
+        color: var(--done);
+      }
+      .report-card-badge.delay {
+        background: #fbeae8;
+        color: var(--delay);
+      }
+      .report-card-badge.ahead {
+        background: #eaf6ef;
+        color: var(--ahead);
+      }
+      .report-card-badge.neutral {
+        background: #eef0f2;
+        color: var(--neutral);
+      }
+      .report-card-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+      .report-card-dates {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        flex-direction: column;
+        color: var(--muted);
+      }
+      .report-card-dates b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .report-empty {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 6px 2px;
+      }
+
+      @media (max-width: 1180px) {
+        .report-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 860px) {
+        .report-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stat:nth-child(2) {
+          border-right: none;
+        }
+        .date-grid {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .overall-grid {
+          grid-template-columns: 1fr;
+        }
+        .header-title {
+          min-width: 100%;
+          order: -1;
+        }
+        .tool-group {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tabbar">
+      <div class="tabbar-inner">
+        <button class="tab-btn active" data-view="timeline">Timeline</button>
+        <button class="tab-btn" data-view="report">Report</button>
+      </div>
+    </div>
+
+    <div class="wrap view active" id="timelineView">
+      <div class="today-control">
+        <span class="today-control-label">✎ Today</span>
+        <input type="date" id="todayDateInput" class="today-date-input" />
+        <span class="today-control-badge" id="todayControlBadge"
+          >CUT OFF · 18 AUG 2026</span
+        >
+        <span class="sync-badge" id="syncBadge" data-state="connecting"
+          ><span class="dot"></span
+          ><span id="syncBadgeText">Connecting…</span></span
+        >
+        <button type="button" id="editLockBtn" class="edit-lock-btn">
+          🔒 View onlyasdfsdaf
+        </button>
+      </div>
+      <div class="view-only-banner" id="viewOnlyBanner">
+        You're viewing a read-only copy.
+      </div>
+
+      <header>
+        <div
+          class="eyebrow editable-text"
+          id="projectEyebrow"
+          contenteditable="true"
+          spellcheck="false"
+        >
+          Pineapple Project · Rev.1
+        </div>
+        <h1
+          class="editable-text"
+          id="pageTitle"
+          contenteditable="true"
+          spellcheck="false"
+        >
+          CHW1A Milestone Timeline
+        </h1>
+        <p
+          class="sub editable-text"
+          id="pageSub"
+          contenteditable="true"
+          spellcheck="false"
+        >
+          Data center construction schedule from piling through final project
+          close-out, across two delivery phases.
+        </p>
+        <div
+          class="hint editable-text"
+          id="pageHint"
+          contenteditable="true"
+          spellcheck="false"
+        >
+          ✎ Tick a milestone to mark it complete and log its completed date.
+          Click a row to expand. Rows re-sort automatically by date, earliest on
+          top.
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="n" id="statBaselineFinish">08 Apr '27</div>
+            <div class="l">Baseline finish</div>
+          </div>
+          <div class="stat">
+            <div class="n" id="statForecastFinish">08 Apr '27</div>
+            <div class="l">Forecast finish</div>
+          </div>
+          <div class="stat">
+            <div class="n" id="statVariance">On baseline</div>
+            <div class="l">Finish variance</div>
+          </div>
+          <div class="stat">
+            <div class="n" id="statCompleted">9 / 15</div>
+            <div class="l">Completed</div>
+          </div>
+          <div class="stat">
+            <div class="n" id="rsDaysToNext" style="color: red">--</div>
+            <div class="l"></div>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-cap" id="progressCap">
+          9 of 15 milestones complete (60%)
+        </div>
+      </header>
+
+      <div class="toolbar">
+        <div class="filters">
+          <button class="chip active" data-filter="all">All milestones</button>
+          <button class="chip" data-filter="p1">Phase 01</button>
+          <button class="chip" data-filter="p2">Phase 02</button>
+        </div>
+        <div class="tool-group">
+          <button class="tool-btn" id="expandAllBtn">Expand all</button>
+          <button class="tool-btn" id="collapseAllBtn">Collapse all</button>
+          <button class="tool-btn" id="resetBtn">↺ Reset all edits</button>
+          <button class="tool-btn tool-btn-primary" id="addMilestoneBtn">
+            + Add milestone
+          </button>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span
+          ><span class="dot" style="background: var(--p1)"></span>Phase 01</span
+        >
+        <span
+          ><span class="dot" style="background: var(--p2)"></span>Phase 02</span
+        >
+        <span
+          ><span class="dot" style="background: var(--done)"></span
+          >Complete</span
+        >
+        <span
+          ><span class="sw" style="background: var(--delay)"></span>Behind
+          baseline</span
+        >
+        <span
+          ><span class="sw" style="background: var(--ahead)"></span>Ahead of
+          baseline</span
+        >
+      </div>
+
+      <div class="timeline" id="timeline">
+        <div class="spine"></div>
+
+        <div class="phase-header p1" data-phase="p1">
+          Phase 01 — Data Halls 1–4
+        </div>
+
+        <!-- 1 -->
+        <div class="node" data-group="core" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >Piling Start</span
+              >
+              <span class="header-date">01 May 2025</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Data center piling and underground works begin.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2025-05-01"
+                    value="2025-05-01"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2025-05-01"
+                    value="2025-05-01"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2025-05-01"
+                    value="2025-05-01"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG4249</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 2.5 months later (baseline)</div>
+
+        <!-- 2 -->
+        <div class="node" data-group="core" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >Steel Erect Start</span
+              >
+              <span class="header-date">15 Jul 2025</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Steel structure erection begins.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2025-07-15"
+                    value="2025-07-15"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2025-07-15"
+                    value="2025-07-15"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2025-07-15"
+                    value="2025-07-15"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG0162</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 5.5 months later (baseline)</div>
+
+        <!-- 3 -->
+        <div class="node" data-group="core" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FSA, DCH 1 &amp; 2 Sealed</span
+              >
+              <span class="header-date">03 Jan 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Data Halls 1 &amp; 2 reach weathertight completion.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-01-03"
+                    value="2026-01-03"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-01-03"
+                    value="2026-01-03"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-01-03"
+                    value="2026-01-03"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG4417</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 1 month later (baseline)</div>
+
+        <!-- 4 -->
+        <div class="node" data-group="core" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FSA, DCH 3 &amp; 4 Sealed</span
+              >
+              <span class="header-date">02 Feb 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Data Halls 3 &amp; 4 reach weathertight completion.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-02-02"
+                    value="2026-02-02"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-02-02"
+                    value="2026-02-02"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-02-02"
+                    value="2026-02-02"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG4419</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 4 months later (baseline)</div>
+
+        <!-- 5 -->
+        <div class="node" data-group="p1access" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >SSNR Early Access</span
+              >
+              <span class="header-date">03 Jul 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Security Services Network Room becomes accessible.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-07-03"
+                    value="2026-07-03"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-07-03"
+                    value="2026-07-03"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-07-03"
+                    value="2026-07-03"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG5841</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 1 week later (baseline)</div>
+
+        <!-- 6 -->
+        <div class="node" data-group="p1access" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >EFA 1</span
+              >
+              <span class="header-date">09 Jul 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Early Floor Access, phase 1.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-07-09"
+                    value="2026-07-09"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-07-09"
+                    value="2026-07-09"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-07-09"
+                    value="2026-07-09"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG3900</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 2 weeks later (baseline)</div>
+
+        <!-- 7 -->
+        <div class="node" data-group="p1access" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >DCH QA 1</span
+              >
+              <span class="header-date">21 Jul 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Data hall network QA begins, phase 1.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-07-21"
+                    value="2026-07-21"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-07-21"
+                    value="2026-07-21"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-07-21"
+                    value="2026-07-21"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG4150</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 1 week later (baseline)</div>
+
+        <!-- 8 -->
+        <div class="node" data-group="p1access" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >MDA Early Access</span
+              >
+              <span class="header-date">27 Jul 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Main Distribution Area becomes accessible.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-07-27"
+                    value="2026-07-27"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-07-27"
+                    value="2026-07-27"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-07-27"
+                    value="2026-07-27"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG0194</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 2 weeks later (baseline)</div>
+
+        <!-- 9 -->
+        <div class="node" data-group="p1access" data-phase="p1">
+          <div class="marker p1 done"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  checked
+                  data-original-checked="true"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >MDA / SSNR Ready</span
+              >
+              <span class="header-date">11 Aug 2026</span>
+              <span class="status done">Complete</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Main Distribution Area and SSNR both fully ready.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-08-11"
+                    value="2026-08-11"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-08-11"
+                    value="2026-08-11"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row show">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original="2026-08-11"
+                    value="2026-08-11"
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG0195</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="today-row">
+          <div class="today-line"></div>
+          <div class="today-pill" id="todayPillTimeline">
+            TODAY · 18 AUG 2026
+          </div>
+          <div class="today-line"></div>
+        </div>
+
+        <!-- 10 -->
+        <div class="gap-label">↓ ~2 months later (baseline)</div>
+        <div class="node" data-group="p2baseline" data-phase="p2">
+          <div class="marker p2"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >EFA 2</span
+              >
+              <span class="header-date">05 Oct 2026</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Early Floor Access, phase 2.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-10-05"
+                    value="2026-10-05"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-10-05"
+                    value="2026-10-05"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG3905</b> · Phase 02</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ ~2 weeks later (baseline)</div>
+
+        <!-- 11 -->
+        <div class="node" data-group="p2baseline" data-phase="p2">
+          <div class="marker p2"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >DCH QA 2</span
+              >
+              <span class="header-date">17 Oct 2026</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Data hall network QA begins, phase 2.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-10-17"
+                    value="2026-10-17"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-10-17"
+                    value="2026-10-17"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG4153</b> · Phase 02</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ 10 days later (baseline)</div>
+
+        <!-- 12 -->
+        <div class="node" data-group="p1completion" data-phase="p1">
+          <div class="marker p1"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FR / SC 1</span
+              >
+              <span class="header-date">27 Oct 2026</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Facility ready / substantial completion, phase 1.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2026-10-27"
+                    value="2026-10-27"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2026-10-27"
+                    value="2026-10-27"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG0220</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ ~11 weeks later (baseline)</div>
+
+        <!-- 13 -->
+        <div class="node" data-group="p1completion" data-phase="p1">
+          <div class="marker p1"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FC / PCO 1</span
+              >
+              <span class="header-date">09 Jan 2027</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Final completion / project close-out, phase 1.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2027-01-09"
+                    value="2027-01-09"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2027-01-09"
+                    value="2027-01-09"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG----</b> · Phase 01</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ ~2 weeks later (baseline)</div>
+
+        <!-- 14 -->
+        <div class="node" data-group="p2baseline" data-phase="p2">
+          <div class="marker p2"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FR / SC 2</span
+              >
+              <span class="header-date">23 Jan 2027</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Facility ready / substantial completion, phase 2.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    class="baseline-input"
+                    data-original="2027-01-23"
+                    value="2027-01-23"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    class="forecast-input"
+                    data-original="2027-01-23"
+                    value="2027-01-23"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG0250</b> · Phase 02</div>
+            </div>
+          </div>
+        </div>
+        <div class="gap-label">↓ ~12 weeks later (baseline)</div>
+
+        <!-- 15 -->
+        <div class="node" data-group="p2baseline" data-phase="p2">
+          <div class="marker p2"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"
+                ><input
+                  type="checkbox"
+                  class="complete-checkbox"
+                  data-original-checked="false"
+              /></span>
+              <span
+                class="header-title editable-text"
+                contenteditable="true"
+                spellcheck="false"
+                >FC / PCO 2</span
+              >
+              <span class="header-date">08 Apr 2027</span>
+              <span class="status">Upcoming</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"
+                ><span class="header-progress-track"
+                  ><span class="header-progress-fill"></span></span
+                ><span class="header-progress-text">0%</span></span
+              ><button
+                type="button"
+                class="delete-btn"
+                title="Delete milestone"
+              >
+                🗑</button
+              ><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div
+                class="desc editable-text"
+                contenteditable="true"
+                spellcheck="false"
+              >
+                Final completion / project close-out, phase 2 — project ends.
+              </div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label
+                  ><input
+                    type="date"
+                    id="finalBaselineInput"
+                    class="baseline-input final-milestone"
+                    data-original="2027-04-08"
+                    value="2027-04-08"
+                  />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label
+                  ><input
+                    type="date"
+                    id="finalForecastInput"
+                    class="forecast-input final-milestone"
+                    data-original="2027-04-08"
+                    value="2027-04-08"
+                  />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row">
+                <div class="date-field">
+                  <label>Completed date</label
+                  ><input
+                    type="date"
+                    class="completed-input"
+                    data-original=""
+                    value=""
+                  />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value=""
+                      placeholder="0"
+                      data-original=""
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>GG----</b> · Phase 02</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overall-card">
+        <div class="title">Overall</div>
+        <div class="overall-grid">
+          <div>
+            <label>Baseline finish</label>
+            <div class="n" id="overallBaselineFinish">08 Apr 2027</div>
+          </div>
+          <div>
+            <label>Forecast finish</label>
+            <div class="n" id="overallForecastFinish">08 Apr 2027</div>
+          </div>
+          <div>
+            <label>Variance</label>
+            <div id="overallVariance">On baseline</div>
+          </div>
+        </div>
+      </div>
+
+      <footer
+        id="footerText"
+        class="editable-text"
+        contenteditable="true"
+        spellcheck="false"
+      >
+        CHW1A · Pineapple Project Timeline · Rev.1 2025-01-10<br />
+        Ref: 20240927 YAWN — Construction Agreement (GMP) — Thailand (cln)_for
+        RFP 2
+      </footer>
+    </div>
+
+    <div class="wrap report-wrap view" id="reportView">
+      <div class="report-section" id="reportSection">
+        <div class="report-topbar">
+          <div>
+            <div class="report-title-row">
+              <span class="report-icon">📈</span>
+              <h2 class="report-title">CHW1A Key Milestone Report</h2>
+            </div>
+            <p class="report-subtitle">
+              Master Schedule Tracking — Baseline Contract vs Current Forecast
+            </p>
+          </div>
+          <span class="report-live"
+            ><span class="dot"></span
+            ><span id="reportLiveLabel">LIVE SCHEDULE STATUS</span></span
+          >
+        </div>
+
+        <div class="report-filters">
+          <button class="chip active" data-rfilter="all">All milestones</button>
+          <button class="chip" data-rfilter="p1">Phase 01</button>
+          <button class="chip" data-rfilter="p2">Phase 02</button>
+        </div>
+
+        <div class="report-overall">
+          <div class="report-overall-title">
+            Overall
+            <span class="rof-scope" id="reportOverallScope"
+              >All Milestones</span
+            >
+          </div>
+          <div class="report-stats">
+            <div class="report-stat">
+              <span class="report-stat-icon ok">✓</span>
+              <div>
+                <div class="report-stat-label">Completed</div>
+                <div class="report-stat-value" id="rsCompleted">
+                  0 Milestones
+                </div>
+              </div>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat-icon warn">!</span>
+              <div>
+                <div class="report-stat-label">Delayed Milestones</div>
+                <div class="report-stat-value" id="rsDelayed">0</div>
+              </div>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat-icon flag">⚑</span>
+              <div>
+                <div class="report-stat-label">Final Variance</div>
+                <div class="report-stat-value" id="rsVariance">On baseline</div>
+              </div>
+            </div>
+            <div class="report-stat">
+              <span class="report-stat-icon info">▤</span>
+              <div>
+                <div class="report-stat-label">Phase 2 Status</div>
+                <div class="report-stat-value" id="rsPhase2">
+                  0 Not Yet Complete
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="report-grid" id="reportGrid"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="addMilestoneOverlay">
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="addMilestoneTitle"
+      >
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title" id="addMilestoneTitle">Add Milestone</h3>
+            <p class="modal-sub">
+              Creates a new card on the timeline and the executive report.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="modal-x"
+            id="addMilestoneCloseBtn"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <form id="addMilestoneForm">
+          <div class="form-field">
+            <label for="mFieldPhase">Phase</label>
+            <select id="mFieldPhase" required>
+              <option value="p1">Phase 01</option>
+              <option value="p2">Phase 02</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="mFieldTitle">Title</label>
+            <input
+              type="text"
+              id="mFieldTitle"
+              placeholder="e.g. Steel Erect Start"
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label for="mFieldCode">Code</label>
+            <input type="text" id="mFieldCode" placeholder="e.g. GG4249" />
+          </div>
+          <div class="form-field">
+            <label for="mFieldDesc">Description</label>
+            <textarea
+              id="mFieldDesc"
+              placeholder="Short description of this milestone"
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="mFieldBaseline">Baseline</label>
+              <input type="date" id="mFieldBaseline" required />
+            </div>
+            <div class="form-field">
+              <label for="mFieldForecast">Forecast</label>
+              <input type="date" id="mFieldForecast" required />
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="modal-btn" id="addMilestoneCancelBtn">
+              Cancel
+            </button>
+            <button type="submit" class="modal-btn primary">
+              Add milestone
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+      // ============================================================
+      // SHARED PERSISTENCE (Firebase Firestore)
+      // 1. Create a free project at https://console.firebase.google.com
+      // 2. Add a "Web app" and paste its config below.
+      // 3. Create a Firestore database (test mode is fine to start).
+      // Until you fill this in with real values, the page just works
+      // as before (edits are local-only, not shared).
+      // ============================================================
+      const firebaseConfig = {
+        apiKey: "AIzaSyBAFYxJ4avxLvVtDn-wgMeMn1PC1hQzz7A",
+        authDomain: "project-milestone-reporting.firebaseapp.com",
+        projectId: "project-milestone-reporting",
+        storageBucket: "project-milestone-reporting.firebasestorage.app",
+        messagingSenderId: "446017798721",
+        appId: "1:446017798721:web:d122da4e432d2e9f3e7cc0",
+      };
+      const DOC_PATH = { collection: "chw1a-timeline", doc: "state" };
+
+      // ============================================================
+      // EDIT LOCK — simple client-side passphrase gate.
+      // Change this to your own passphrase before publishing.
+      // NOTE: this is NOT real security — anyone who views the page
+      // source can read this value or just remove the `disabled`
+      // attributes in dev tools. It only stops casual/accidental edits
+      // by people you share the link with, not a determined viewer.
+      // ============================================================
+      const EDIT_PASSPHRASE = "changeme123";
+      const UNLOCK_KEY = "chw1a-edit-unlocked";
+
+      function setEditLock(locked) {
+        document
+          .querySelectorAll(
+            ".baseline-input, .forecast-input, .completed-input, .progress-input, .complete-checkbox, #todayDateInput",
+          )
+          .forEach((el) => {
+            el.disabled = locked;
+          });
+        document.querySelectorAll(".editable-text").forEach((el) => {
+          el.contentEditable = locked ? "false" : "true";
+        });
+        const resetBtn = document.getElementById("resetBtn");
+        if (resetBtn) resetBtn.disabled = locked;
+        document.body.classList.toggle("locked-view", locked);
+        const btn = document.getElementById("editLockBtn");
+        if (btn) {
+          btn.textContent = locked ? "🔒 View only" : "🔓 Editing enabled";
+          btn.classList.toggle("unlocked", !locked);
+        }
+      }
+
+      function initEditLock() {
+        const btn = document.getElementById("editLockBtn");
+        if (!btn) return;
+        const startLocked = sessionStorage.getItem(UNLOCK_KEY) !== "1";
+        setEditLock(startLocked);
+        btn.addEventListener("click", () => {
+          const currentlyLocked =
+            document.body.classList.contains("locked-view");
+          if (currentlyLocked) {
+            const pass = prompt("Enter the edit passphrase:");
+            if (pass === null) return;
+            if (pass === EDIT_PASSPHRASE) {
+              sessionStorage.setItem(UNLOCK_KEY, "1");
+              setEditLock(false);
+            } else {
+              alert("Incorrect passphrase.");
+            }
+          } else {
+            sessionStorage.removeItem(UNLOCK_KEY);
+            setEditLock(true);
+          }
+        });
+      }
+      let firebaseDb = null;
+      try {
+        if (
+          firebaseConfig.apiKey &&
+          firebaseConfig.apiKey !== "YOUR_API_KEY" &&
+          window.firebase
+        ) {
+          firebase.initializeApp(firebaseConfig);
+          firebaseDb = firebase.firestore();
+        }
+      } catch (e) {
+        console.error("Firebase init failed:", e);
+      }
+
+      // ---- Sync status indicator ----
+      function setSyncStatus(state, text) {
+        const badge = document.getElementById("syncBadge");
+        const label = document.getElementById("syncBadgeText");
+        if (!badge || !label) return;
+        badge.dataset.state = state;
+        label.textContent = text;
+        badge.title =
+          state === "error"
+            ? "Check the browser console and your Firestore security rules."
+            : "";
+      }
+      if (!firebaseDb) {
+        setSyncStatus("offline", "Not connected");
+      }
+
+      const TOTAL_MILESTONES =
+        document.querySelectorAll(".node[data-phase]").length;
+
+      // Stable key per milestone, independent of visual reordering (assigned once, in source order).
+      document.querySelectorAll(".node[data-phase]").forEach((node, i) => {
+        node.dataset.mkey = "m" + i;
+      });
+
+      // Counter for newly-added milestones, continuing on from the statically-rendered ones.
+      let nextMkeyIndex = TOTAL_MILESTONES;
+      function nextMkey() {
+        return "m" + nextMkeyIndex++;
+      }
+
+      // ---- Building & wiring new milestone cards (used by "Add milestone" and by remote-state sync) ----
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      // Milestones added after page load don't belong to one of the four fixed
+      // report categories, so they default into a sensible bucket per phase.
+      function defaultGroupForPhase(phase) {
+        return phase === "p2" ? "p2baseline" : "p1completion";
+      }
+
+      function buildMilestoneNode(data) {
+        const phase = data.phase === "p2" ? "p2" : "p1";
+        const group = data.group || defaultGroupForPhase(phase);
+        const phaseLabel = phase === "p2" ? "Phase 02" : "Phase 01";
+        const checked = !!data.checked;
+        const baseline = data.baseline || "";
+        const forecast = data.forecast || baseline;
+        const completed = data.completed || "";
+        // If it's marked complete and no one entered a progress value, default to 100.
+        const progressValue =
+          data.progress === "" || data.progress == null
+            ? checked
+              ? 100
+              : ""
+            : data.progress;
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = `
+        <div class="node" data-group="${escapeHtml(group)}" data-phase="${phase}">
+          <div class="marker ${phase}${checked ? " done" : ""}"></div>
+          <div class="card">
+            <div class="card-header">
+              <span class="checkbox-wrap"><input type="checkbox" class="complete-checkbox" ${checked ? "checked" : ""} data-original-checked="${checked}" /></span>
+              <span class="header-title editable-text" contenteditable="true" spellcheck="false">${escapeHtml(data.title)}</span>
+              <span class="header-date"></span>
+              <span class="status${checked ? " done" : ""}">${checked ? "Complete" : "Upcoming"}</span>
+              <span class="header-variance">On baseline</span>
+              <span class="header-progress-wrap" title="Progress"><span class="header-progress-track"><span class="header-progress-fill"></span></span><span class="header-progress-text">0%</span></span><button type="button" class="delete-btn" title="Delete milestone">🗑</button><span class="chevron">▸</span>
+            </div>
+            <div class="card-body">
+              <div class="desc editable-text" contenteditable="true" spellcheck="false">${escapeHtml(data.description)}</div>
+              <div class="date-grid">
+                <div class="date-field">
+                  <label>Baseline</label><input type="date" class="baseline-input" data-original="${baseline}" value="${baseline}" />
+                </div>
+                <div class="date-field">
+                  <label>Forecast</label><input type="date" class="forecast-input" data-original="${forecast}" value="${forecast}" />
+                </div>
+                <div class="variance">On baseline</div>
+              </div>
+              <div class="completed-row${checked ? " show" : ""}">
+                <div class="date-field">
+                  <label>Completed date</label><input type="date" class="completed-input" data-original="${completed}" value="${completed}" />
+                </div>
+                <span class="completed-tag">✓ Logged</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-row-top">
+                  <label>Progress</label>
+                  <div class="progress-input-wrap">
+                    <input
+                      type="number"
+                      class="progress-input"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value="${progressValue}"
+                      placeholder="0"
+                      data-original="${progressValue}"
+                    />
+                    <span class="progress-pct-suffix">%</span>
+                  </div>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+              <div class="meta"><b>${escapeHtml(data.code || "—")}</b> · ${phaseLabel}</div>
+            </div>
+          </div>
+        </div>`.trim();
+        return wrapper.firstElementChild;
+      }
+
+      // Attaches the same interaction behavior the statically-rendered cards get further
+      // below (checkbox toggling, expand/collapse, date-field syncing) to a card created
+      // at runtime — either via "Add milestone" or when reconstructing a milestone that
+      // arrived from shared/remote state but doesn't exist in this browser's DOM yet.
+      function wireMilestoneCard(node) {
+        const card = node.querySelector(".card");
+
+        card
+          .querySelectorAll(".baseline-input, .forecast-input")
+          .forEach((input) => {
+            input.addEventListener("change", () => {
+              updateRow(card);
+              refreshTimelineStats();
+              scheduleSave();
+            });
+          });
+
+        const completedInput = card.querySelector(".completed-input");
+        completedInput.addEventListener("change", () => {
+          const cb = card.querySelector(".complete-checkbox");
+          if (cb.checked) syncForecastToCompleted(card);
+          scheduleSave();
+        });
+
+        const cb = card.querySelector(".complete-checkbox");
+        cb.addEventListener("change", () => {
+          const statusEl = card.querySelector(".status");
+          const markerEl = card.closest(".node").querySelector(".marker");
+          const completedRow = card.querySelector(".completed-row");
+          const ci = card.querySelector(".completed-input");
+          if (cb.checked) {
+            statusEl.textContent = "Complete";
+            statusEl.classList.add("done");
+            markerEl.classList.add("done");
+            completedRow.classList.add("show");
+            if (!ci.value) {
+              const forecastInput = card.querySelector(".forecast-input");
+              const today = new Date().toISOString().slice(0, 10);
+              ci.value = forecastInput.value || today;
+            }
+            syncForecastToCompleted(card);
+            const progressInput = card.querySelector(".progress-input");
+            if (progressInput && !progressInput.value)
+              progressInput.value = "100";
+          } else {
+            statusEl.textContent = "Upcoming";
+            statusEl.classList.remove("done");
+            markerEl.classList.remove("done");
+            completedRow.classList.remove("show");
+            updateHeaderDate(card);
+          }
+          updateProgressUI(card);
+          updateCompletedCount();
+          scheduleSave();
+        });
+
+        const progressInput = card.querySelector(".progress-input");
+        if (progressInput) {
+          progressInput.addEventListener("input", () => {
+            const v = progressInput.value;
+            if (v !== "") {
+              const clamped = Math.max(0, Math.min(100, parseFloat(v) || 0));
+              if (String(clamped) !== v) progressInput.value = clamped;
+            }
+            updateProgressUI(card);
+          });
+          progressInput.addEventListener("change", () => {
+            scheduleSave();
+          });
+        }
+        updateProgressUI(card);
+
+        const hdr = card.querySelector(".card-header");
+        hdr.addEventListener("click", (e) => {
+          if (e.target.closest(".checkbox-wrap")) return;
+          if (e.target.closest(".editable-text")) return;
+          if (e.target.closest(".delete-btn")) return;
+          hdr.closest(".card").classList.toggle("open");
+        });
+
+        card.querySelectorAll(".editable-text").forEach((el) => {
+          el.addEventListener("input", () => {
+            scheduleSave();
+          });
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && el.classList.contains("header-title"))
+              e.preventDefault();
+          });
+        });
+
+        wireDeleteButton(node);
+
+        // Re-apply the current lock state so a card that arrives while the page
+        // is locked (e.g. via remote sync) doesn't render as editable.
+        if (typeof setEditLock === "function") {
+          setEditLock(document.body.classList.contains("locked-view"));
+        }
+      }
+
+      // Inserts one more gap-label so the transition into/out of the new card gets
+      // a "X later" caption too (reorderTimeline consumes these positionally).
+      function addGapLabelSlot() {
+        const timeline = document.getElementById("timeline");
+        const gl = document.createElement("div");
+        gl.className = "gap-label";
+        timeline.appendChild(gl);
+        return gl;
+      }
+
+      function insertMilestone(data) {
+        const timeline = document.getElementById("timeline");
+        const node = buildMilestoneNode(data);
+        node.dataset.mkey = data.mkey || nextMkey();
+        timeline.appendChild(node);
+        addGapLabelSlot();
+        wireMilestoneCard(node);
+        const card = node.querySelector(".card");
+        updateHeaderDate(card);
+        updateRow(card);
+        reorderTimeline();
+        refreshTimelineStats();
+        renderReport();
+        return node;
+      }
+
+      // Removes a milestone node and rebalances the gap-label count (one label
+      // exists per gap between nodes, so deleting a node means one fewer gap).
+      function removeMilestoneNode(node) {
+        if (!node) return;
+        let gl = node.nextElementSibling;
+        while (gl && !gl.classList.contains("gap-label")) {
+          if (gl.classList.contains("node")) {
+            gl = null;
+            break;
+          }
+          gl = gl.nextElementSibling;
+        }
+        if (!gl) {
+          gl = node.previousElementSibling;
+          while (gl && !gl.classList.contains("gap-label")) {
+            if (gl.classList.contains("node")) {
+              gl = null;
+              break;
+            }
+            gl = gl.previousElementSibling;
+          }
+        }
+        if (gl) gl.remove();
+        node.remove();
+      }
+
+      function wireDeleteButton(node) {
+        const btn = node.querySelector(".delete-btn");
+        if (!btn) return;
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (document.body.classList.contains("locked-view")) return;
+          const title =
+            node.querySelector(".header-title").innerText.trim() ||
+            "this milestone";
+          if (!confirm('Delete "' + title + '"? This cannot be undone.'))
+            return;
+          removeMilestoneNode(node);
+          reorderTimeline();
+          refreshTimelineStats();
+          renderReport();
+          scheduleSave();
+        });
+      }
+
+      document
+        .querySelectorAll(".node[data-phase]")
+        .forEach((node) => wireDeleteButton(node));
+
+      // ---- Add-milestone modal ----
+      function initAddMilestoneModal() {
+        const overlay = document.getElementById("addMilestoneOverlay");
+        const openBtn = document.getElementById("addMilestoneBtn");
+        const closeBtn = document.getElementById("addMilestoneCloseBtn");
+        const cancelBtn = document.getElementById("addMilestoneCancelBtn");
+        const form = document.getElementById("addMilestoneForm");
+        if (!overlay || !openBtn || !form) return;
+
+        function close() {
+          overlay.classList.remove("open");
+          form.reset();
+        }
+        function open() {
+          if (document.body.classList.contains("locked-view")) return;
+          overlay.classList.add("open");
+          document.getElementById("mFieldTitle").focus();
+        }
+        openBtn.addEventListener("click", open);
+        closeBtn.addEventListener("click", close);
+        cancelBtn.addEventListener("click", close);
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) close();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("open")) close();
+        });
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const phase = document.getElementById("mFieldPhase").value;
+          const title = document.getElementById("mFieldTitle").value.trim();
+          const code = document.getElementById("mFieldCode").value.trim();
+          const description = document
+            .getElementById("mFieldDesc")
+            .value.trim();
+          const baseline = document.getElementById("mFieldBaseline").value;
+          const forecast =
+            document.getElementById("mFieldForecast").value || baseline;
+          if (!title || !baseline || !forecast) return;
+
+          insertMilestone({
+            phase,
+            title,
+            code,
+            description,
+            baseline,
+            forecast,
+            completed: "",
+            checked: false,
+          });
+          scheduleSave();
+          close();
+        });
+      }
+
+      // ---- Tab navigation ----
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const views = {
+        timeline: document.getElementById("timelineView"),
+        report: document.getElementById("reportView"),
+      };
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          tabBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const target = btn.dataset.view;
+          Object.keys(views).forEach((key) =>
+            views[key].classList.toggle("active", key === target),
+          );
+          if (target === "report") renderReport();
+        });
+      });
+
+      // ---- Filters ----
+      // Scoped to the toolbar specifically — the Report tab has its own ".chip" buttons
+      // (.report-filters .chip) with a separate handler further down; a global ".chip"
+      // selector here would attach this handler to those too and break the Timeline view.
+      const chips = document.querySelectorAll(".filters .chip");
+      const filterables = document.querySelectorAll(
+        ".node, .phase-header, .today-row",
+      );
+      let timelineFilter = "all";
+
+      // A gap-label describes the interval between the two milestone nodes it sits
+      // between. When a phase filter hides nodes, a label can no longer just be
+      // shown/hidden based on its original neighbors — it needs to be RECALCULATED
+      // against whichever nodes are actually visible, skipping over anything hidden.
+      // The first visible node in a filtered phase has no visible predecessor to
+      // measure against, so its gap is measured from TODAY instead.
+      function neighborNode(el, direction) {
+        let sib =
+          direction === "prev"
+            ? el.previousElementSibling
+            : el.nextElementSibling;
+        while (sib && !sib.classList.contains("node")) {
+          sib =
+            direction === "prev"
+              ? sib.previousElementSibling
+              : sib.nextElementSibling;
+        }
+        return sib;
+      }
+
+      // Synthetic label inserted above the first visible node of a filtered phase
+      // when it has no visible predecessor of its own (TODAY -> 1st activity).
+      let leadGapLabel = null;
+      function getLeadGapLabel() {
+        if (!leadGapLabel) {
+          leadGapLabel = document.createElement("div");
+          leadGapLabel.className = "gap-label gap-label-lead";
+        }
+        return leadGapLabel;
+      }
+
+      function refreshGapLabelVisibility(f) {
+        const timeline = document.getElementById("timeline");
+        const nodeEls = Array.from(
+          document.querySelectorAll(".node[data-phase]"),
+        );
+        const todayInputEl = document.getElementById("todayDateInput");
+        const todayISO = todayInputEl ? todayInputEl.value : "";
+
+        // Get currently visible nodes based on active phase filter
+        const isVisible = (node) => f === "all" || node.dataset.phase === f;
+        const visibleNodes = nodeEls.filter(isVisible);
+
+        // Hide all static gap labels first
+        document
+          .querySelectorAll(".gap-label:not(.gap-label-lead)")
+          .forEach((gl) => {
+            gl.style.display = "none";
+          });
+
+        // Loop through visible nodes and update the gap label between consecutive visible pairs
+        for (let i = 0; i < visibleNodes.length - 1; i++) {
+          const currentNode = visibleNodes[i];
+          const nextNode = visibleNodes[i + 1];
+
+          // Find the gap-label element attached directly after currentNode
+          let gapLabel = currentNode.nextElementSibling;
+          while (gapLabel && !gapLabel.classList.contains("gap-label")) {
+            if (gapLabel.classList.contains("node")) {
+              gapLabel = null; // Reached next node without finding a gap label
+              break;
+            }
+            gapLabel = gapLabel.nextElementSibling;
+          }
+
+          if (gapLabel) {
+            const fromISO =
+              effectiveDateOf(currentNode.querySelector(".card")) || todayISO;
+            const toISO =
+              effectiveDateOf(nextNode.querySelector(".card")) || todayISO;
+            const d = diffDays(fromISO, toISO);
+
+            gapLabel.textContent = "↓ " + humanizeGap(d) + " (forecast)";
+            gapLabel.style.display = "";
+          }
+        }
+
+        // TODAY -> 1st milestone gap label (When Phase 02 is selected)
+        const lead = getLeadGapLabel();
+        const firstVisibleNode =
+          visibleNodes.length > 0 ? visibleNodes[0] : null;
+
+        if (f === "p2" && firstVisibleNode && todayISO && timeline) {
+          const forecast =
+            effectiveDateOf(firstVisibleNode.querySelector(".card")) ||
+            todayISO;
+          const d = diffDays(todayISO, forecast);
+          lead.textContent = "↓ " + humanizeGap(d) + " (from today)";
+          timeline.insertBefore(lead, firstVisibleNode);
+        } else if (lead.parentNode) {
+          lead.parentNode.removeChild(lead);
+        }
+      }
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          const f = chip.dataset.filter;
+          timelineFilter = f;
+          filterables.forEach((n) => {
+            if (f === "all") {
+              n.style.display = "";
+              return;
+            }
+            if (n.classList.contains("today-row")) {
+              n.style.display = "";
+              return;
+            }
+            if (n.dataset.phase) {
+              n.style.display = n.dataset.phase === f ? "" : "none";
+            }
+          });
+          refreshGapLabelVisibility(f);
+          refreshTimelineStats();
+        });
+      });
+
+      // ---- Collapse / expand ----
+      document.querySelectorAll(".card-header").forEach((hdr) => {
+        hdr.addEventListener("click", (e) => {
+          if (e.target.closest(".checkbox-wrap")) return;
+          if (e.target.closest(".editable-text")) return;
+          if (e.target.closest(".delete-btn")) return;
+          hdr.closest(".card").classList.toggle("open");
+        });
+      });
+      document.getElementById("expandAllBtn").addEventListener("click", () => {
+        document
+          .querySelectorAll(".card")
+          .forEach((c) => c.classList.add("open"));
+      });
+      document
+        .getElementById("collapseAllBtn")
+        .addEventListener("click", () => {
+          document
+            .querySelectorAll(".card")
+            .forEach((c) => c.classList.remove("open"));
+        });
+
+      // ---- Date helpers ----
+      function parseISO(iso) {
+        return new Date(iso + "T00:00:00Z");
+      }
+      function diffDays(baselineISO, forecastISO) {
+        const a = parseISO(baselineISO),
+          b = parseISO(forecastISO);
+        return Math.round((b - a) / 86400000);
+      }
+      // Sign convention: forecast earlier than baseline (ahead of schedule) shows "+",
+      // forecast later than baseline (delayed) shows "-". d = forecast - baseline in days.
+      function formatVariance(d) {
+        if (isNaN(d)) return { text: "—", cls: "" };
+        if (d === 0) return { text: "On baseline", cls: "" };
+        const cls = d > 0 ? "delay" : "ahead";
+        const displayD = -d;
+        const sign = displayD > 0 ? "+" : "-";
+        const abs = Math.abs(displayD);
+        return { text: sign + abs + " day" + (abs === 1 ? "" : "s"), cls };
+      }
+      function fmtDisplay(iso) {
+        const d = parseISO(iso);
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        return (
+          String(d.getUTCDate()).padStart(2, "0") +
+          " " +
+          months[d.getUTCMonth()] +
+          " " +
+          d.getUTCFullYear()
+        );
+      }
+      function fmtShort(iso) {
+        const d = parseISO(iso);
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        return (
+          String(d.getUTCDate()).padStart(2, "0") +
+          " " +
+          months[d.getUTCMonth()] +
+          " '" +
+          String(d.getUTCFullYear()).slice(-2)
+        );
+      }
+      function fmtSlash(iso) {
+        if (!iso) return "—";
+        const d = parseISO(iso);
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        return (
+          String(d.getUTCDate()).padStart(2, "0") +
+          "/" +
+          months[d.getUTCMonth()] +
+          "/" +
+          String(d.getUTCFullYear()).slice(-2)
+        );
+      }
+      function fmtPillUpper(iso) {
+        const d = parseISO(iso);
+        const months = [
+          "JAN",
+          "FEB",
+          "MAR",
+          "APR",
+          "MAY",
+          "JUN",
+          "JUL",
+          "AUG",
+          "SEP",
+          "OCT",
+          "NOV",
+          "DEC",
+        ];
+        return (
+          String(d.getUTCDate()).padStart(2, "0") +
+          " " +
+          months[d.getUTCMonth()] +
+          " " +
+          d.getUTCFullYear()
+        );
+      }
+
+      // Row header date: completed date if the milestone is marked complete, else the forecast date.
+      function updateHeaderDate(card) {
+        const headerDate = card.querySelector(".header-date");
+        const cb = card.querySelector(".complete-checkbox");
+        const completedInput = card.querySelector(".completed-input");
+        const forecastInput = card.querySelector(".forecast-input");
+        const iso =
+          cb.checked && completedInput.value
+            ? completedInput.value
+            : forecastInput.value || forecastInput.dataset.original;
+        if (iso) headerDate.textContent = fmtDisplay(iso);
+      }
+
+      // ---- Gap labels: forecast-to-forecast (or actual, once logged) spacing between milestones ----
+      function effectiveDateOf(card) {
+        const cb = card.querySelector(".complete-checkbox");
+        const completedInput = card.querySelector(".completed-input");
+        const forecastInput = card.querySelector(".forecast-input");
+        return cb.checked && completedInput.value
+          ? completedInput.value
+          : forecastInput.value || forecastInput.dataset.original;
+      }
+
+      // Pure forecast field value — used for gap-label math regardless of completion status,
+      // so editing a Forecast date always moves the "X later" text between two activities.
+      function forecastOnlyOf(card) {
+        const forecastInput = card.querySelector(".forecast-input");
+        return forecastInput.value || forecastInput.dataset.original;
+      }
+
+      function humanizeGap(d) {
+        if (isNaN(d)) return "—";
+        const dir = d < 0 ? " earlier" : " later";
+        const ad = Math.abs(d);
+        if (ad === 0) return "Same day";
+        if (ad < 21) {
+          return ad + (ad === 1 ? " day" : " days") + dir;
+        }
+        if (ad < 60) {
+          const w = Math.round(ad / 7);
+          return w + (w === 1 ? " week" : " weeks") + dir;
+        }
+        let m = Math.round((ad / 30.44) * 2) / 2;
+        const mLabel = m % 1 === 0 ? m.toFixed(0) : m.toFixed(1);
+        return mLabel + (m === 1 ? " month" : " months") + dir;
+      }
+
+      // Remove the static phase-header dividers once — they no longer make sense once
+      // rows are sorted by date across phases instead of grouped in fixed blocks.
+      function removePhaseHeaders() {
+        document.querySelectorAll(".phase-header").forEach((el) => el.remove());
+      }
+
+      // Reorders milestone rows by effective date (earliest on top, latest on bottom),
+      // repositions the existing gap-label elements between the new neighbors using their
+      // raw Forecast field values, and moves the today-row marker to sit exactly where
+      // "today" falls among the sorted rows.
+      function reorderTimeline() {
+        // Reordering detaches and re-appends every node in the timeline, which
+        // would knock focus out of whatever text field the person is currently
+        // typing in. Titles/descriptions never affect sort order anyway, so it's
+        // safe to just skip a reorder pass while a contenteditable field is focused
+        // — it'll happen next time something that actually needs it fires.
+        if (
+          document.activeElement &&
+          document.activeElement.isContentEditable
+        ) {
+          return;
+        }
+        removePhaseHeaders();
+        const timeline = document.getElementById("timeline");
+        if (!timeline) return;
+        const todayRow = document.querySelector(".today-row");
+        const gapLabels = Array.from(
+          document.querySelectorAll(".gap-label:not(.gap-label-lead)"),
+        );
+        const nodeEls = Array.from(
+          document.querySelectorAll(".node[data-phase]"),
+        );
+
+        const items = nodeEls.map((node, idx) => {
+          const card = node.querySelector(".card");
+          return {
+            node,
+            idx,
+            iso: effectiveDateOf(card),
+            forecastIso: forecastOnlyOf(card),
+          };
+        });
+
+        // Ascending: earliest date on top, latest date on bottom
+        items.sort((a, b) => {
+          if (a.iso === b.iso) return a.idx - b.idx;
+          return a.iso < b.iso ? -1 : 1;
+        });
+
+        const todayInput = document.getElementById("todayDateInput");
+        const todayISO = todayInput ? todayInput.value : "";
+        let todayInserted = false;
+
+        // Detach nodes, gap-labels, and today marker to rebuild clean DOM order
+        [...nodeEls, ...gapLabels, todayRow].forEach((el) => {
+          if (el && el.parentNode === timeline) timeline.removeChild(el);
+        });
+
+        let gapIndex = 0;
+        items.forEach((item, i) => {
+          if (
+            !todayInserted &&
+            todayRow &&
+            todayISO &&
+            item.iso &&
+            item.iso > todayISO
+          ) {
+            timeline.appendChild(todayRow);
+            todayInserted = true;
+          }
+          // Place a static gap label above each node (except the first one)
+          if (i > 0 && gapIndex < gapLabels.length) {
+            const gapLabel = gapLabels[gapIndex++];
+            timeline.appendChild(gapLabel);
+          }
+          timeline.appendChild(item.node);
+        });
+
+        if (!todayInserted && todayRow) timeline.appendChild(todayRow);
+
+        // Recalculate text and handle hiding duplicate/lead gap labels
+        refreshGapLabelVisibility(timelineFilter);
+      }
+
+      // ---- Per-card variance ----
+      function updateRow(card) {
+        const grid = card.querySelector(".date-grid");
+        const baselineInput = grid.querySelector(".baseline-input");
+        const forecastInput = grid.querySelector(".forecast-input");
+        const baseline = baselineInput.value || baselineInput.dataset.original;
+        const forecast = forecastInput.value || forecastInput.dataset.original;
+        const d = diffDays(baseline, forecast);
+        const { text, cls } = formatVariance(d);
+
+        grid.querySelector(".variance").textContent = text;
+        grid.querySelector(".variance").className =
+          "variance" + (cls ? " " + cls : "");
+
+        const hv = card.querySelector(".header-variance");
+        hv.textContent = text;
+        hv.className = "header-variance" + (cls ? " " + cls : "");
+
+        updateHeaderDate(card);
+        refreshGapLabelVisibility(timelineFilter);
+        renderReport();
+      }
+
+      document.querySelectorAll(".card").forEach((card) => {
+        card
+          .querySelectorAll(".baseline-input, .forecast-input")
+          .forEach((input) => {
+            input.addEventListener("change", () => {
+              updateRow(card);
+              refreshTimelineStats();
+              scheduleSave();
+            });
+          });
+      });
+
+      // ---- Scope-aware summary stats (top stat bar + Overall card) ----
+      // Reflects whichever toolbar filter is active (All / Phase 01 / Phase 02):
+      // "finish" = the milestone with the latest baseline date within that scope.
+      function collectMilestoneItems() {
+        const items = [];
+        document.querySelectorAll(".node[data-phase]").forEach((node) => {
+          const card = node.querySelector(".card");
+          const cb = card.querySelector(".complete-checkbox");
+          const baselineInput = card.querySelector(".baseline-input");
+          const forecastInput = card.querySelector(".forecast-input");
+          items.push({
+            phase: node.dataset.phase,
+            baseline: baselineInput.value || baselineInput.dataset.original,
+            forecast: forecastInput.value || forecastInput.dataset.original,
+            done: cb.checked,
+          });
+        });
+        return items;
+      }
+
+      function refreshTimelineStats() {
+        const items = collectMilestoneItems();
+        const scoped =
+          timelineFilter === "all"
+            ? items
+            : items.filter((i) => i.phase === timelineFilter);
+        const total = scoped.length;
+        const doneCount = scoped.filter((i) => i.done).length;
+        const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+        let baselineFinish = "",
+          forecastFinish = "";
+        if (scoped.length) {
+          const anchor = scoped.reduce(
+            (max, cur) => (!max || cur.baseline > max.baseline ? cur : max),
+            null,
+          );
+          baselineFinish = anchor.baseline;
+          forecastFinish = anchor.forecast;
+        }
+        const d =
+          baselineFinish && forecastFinish
+            ? diffDays(baselineFinish, forecastFinish)
+            : NaN;
+        const { text, cls } = formatVariance(d);
+        const bfText = baselineFinish ? fmtDisplay(baselineFinish) : "—";
+        const ffText = forecastFinish ? fmtDisplay(forecastFinish) : "—";
+
+        document.getElementById("statBaselineFinish").textContent = bfText;
+        document.getElementById("statForecastFinish").textContent = ffText;
+        const statVar = document.getElementById("statVariance");
+        statVar.textContent = text;
+        statVar.className = "n" + (cls ? " " + cls : "");
+        document.getElementById("statCompleted").textContent =
+          doneCount + " / " + total;
+        const overallFillEl = document.getElementById("progressFill");
+        overallFillEl.style.width = pct + "%";
+        overallFillEl.style.background = progressColor(pct);
+        document.getElementById("progressCap").textContent =
+          doneCount + " of " + total + " milestones complete (" + pct + "%)";
+
+        document.getElementById("overallBaselineFinish").textContent = bfText;
+        document.getElementById("overallForecastFinish").textContent = ffText;
+        const ov = document.getElementById("overallVariance");
+        ov.textContent = text;
+        ov.className = cls;
+
+        renderReport();
+      }
+
+      // Back-compat aliases — both now delegate to the scope-aware function above.
+      function updateCompletedCount() {
+        refreshTimelineStats();
+      }
+      function updateOverall() {
+        refreshTimelineStats();
+      }
+
+      function syncForecastToCompleted(card) {
+        const completedInput = card.querySelector(".completed-input");
+        const forecastInput = card.querySelector(".forecast-input");
+        if (completedInput.value) {
+          forecastInput.value = completedInput.value;
+          updateRow(card);
+          refreshTimelineStats();
+        }
+      }
+
+      document.querySelectorAll(".complete-checkbox").forEach((cb) => {
+        cb.addEventListener("change", () => {
+          const card = cb.closest(".card");
+          const statusEl = card.querySelector(".status");
+          const markerEl = card.closest(".node").querySelector(".marker");
+          const completedRow = card.querySelector(".completed-row");
+          const completedInput = card.querySelector(".completed-input");
+
+          if (cb.checked) {
+            statusEl.textContent = "Complete";
+            statusEl.classList.add("done");
+            markerEl.classList.add("done");
+            completedRow.classList.add("show");
+            if (!completedInput.value) {
+              const forecastInput = card.querySelector(".forecast-input");
+              const today = new Date().toISOString().slice(0, 10);
+              completedInput.value = forecastInput.value || today;
+            }
+            // Forecast always mirrors the completed (actual) date once marked done
+            syncForecastToCompleted(card);
+            // If no one entered a progress value, completing the milestone defaults it to 100%
+            const progressInput = card.querySelector(".progress-input");
+            if (progressInput && !progressInput.value)
+              progressInput.value = "100";
+          } else {
+            statusEl.textContent = "Upcoming";
+            statusEl.classList.remove("done");
+            markerEl.classList.remove("done");
+            completedRow.classList.remove("show");
+            updateHeaderDate(card);
+          }
+          updateProgressUI(card);
+          updateCompletedCount();
+          scheduleSave();
+        });
+      });
+
+      // Keep forecast synced if the completed date is edited afterward, while still checked
+      document.querySelectorAll(".completed-input").forEach((input) => {
+        input.addEventListener("change", () => {
+          const card = input.closest(".card");
+          const cb = card.querySelector(".complete-checkbox");
+          if (cb.checked) {
+            syncForecastToCompleted(card);
+          }
+          scheduleSave();
+        });
+      });
+
+      // ---- Progress ----
+      // Maps a 0–100 progress value to a color that shifts red -> amber -> green,
+      // so the bar's color communicates status at a glance, not just its width.
+      const PROGRESS_COLOR_STOPS = [
+        { p: 0, c: [192, 57, 43] }, // red   (matches --delay)
+        { p: 50, c: [224, 163, 25] }, // amber
+        { p: 100, c: [46, 139, 87] }, // green (matches --done)
+      ];
+      function progressColor(pct) {
+        const [r, g, b] = progressColorRGB(pct);
+        return "rgb(" + r + ", " + g + ", " + b + ")";
+      }
+      // A light tint of the same status color, used for the track (the
+      // "holder") so the whole pill reads by color even when the actual
+      // fill width is a barely-visible sliver (e.g. the small header bar).
+      function progressColorTint(pct) {
+        const [r, g, b] = progressColorRGB(pct);
+        return "rgba(" + r + ", " + g + ", " + b + ", 0.22)";
+      }
+      function progressColorRGB(pct) {
+        pct = Math.max(0, Math.min(100, pct));
+        let lo = PROGRESS_COLOR_STOPS[0];
+        let hi = PROGRESS_COLOR_STOPS[PROGRESS_COLOR_STOPS.length - 1];
+        for (let i = 0; i < PROGRESS_COLOR_STOPS.length - 1; i++) {
+          if (
+            pct >= PROGRESS_COLOR_STOPS[i].p &&
+            pct <= PROGRESS_COLOR_STOPS[i + 1].p
+          ) {
+            lo = PROGRESS_COLOR_STOPS[i];
+            hi = PROGRESS_COLOR_STOPS[i + 1];
+            break;
+          }
+        }
+        const range = hi.p - lo.p || 1;
+        const t = (pct - lo.p) / range;
+        const r = Math.round(lo.c[0] + (hi.c[0] - lo.c[0]) * t);
+        const g = Math.round(lo.c[1] + (hi.c[1] - lo.c[1]) * t);
+        const b = Math.round(lo.c[2] + (hi.c[2] - lo.c[2]) * t);
+        return [r, g, b];
+      }
+
+      function updateProgressUI(card) {
+        const pi = card.querySelector(".progress-input");
+        const cb = card.querySelector(".complete-checkbox");
+        if (!pi) return;
+        let raw = pi.value;
+        if (raw === "" && cb && cb.checked) {
+          pi.value = "100";
+          raw = "100";
+        }
+        const pct =
+          raw === "" ? 0 : Math.max(0, Math.min(100, parseFloat(raw) || 0));
+        const color = progressColor(pct);
+        const fill = card.querySelector(".progress-fill");
+        if (fill) {
+          fill.style.width = pct + "%";
+          fill.style.background = color;
+          fill.classList.toggle("complete", pct >= 100);
+        }
+        const node = card.closest(".node");
+        const hFill = node && node.querySelector(".header-progress-fill");
+        const hTrack = node && node.querySelector(".header-progress-track");
+        const hText = node && node.querySelector(".header-progress-text");
+        if (hTrack) hTrack.style.background = progressColorTint(pct);
+        if (hFill) {
+          hFill.style.width = pct + "%";
+          hFill.style.background = color;
+          hFill.classList.toggle("complete", pct >= 100);
+        }
+        if (hText) hText.textContent = pct + "%";
+      }
+
+      document.querySelectorAll(".progress-input").forEach((input) => {
+        input.addEventListener("input", () => {
+          const v = input.value;
+          if (v !== "") {
+            const clamped = Math.max(0, Math.min(100, parseFloat(v) || 0));
+            if (String(clamped) !== v) input.value = clamped;
+          }
+          updateProgressUI(input.closest(".card"));
+        });
+        input.addEventListener("change", () => {
+          scheduleSave();
+        });
+      });
+
+      // ---- Executive Report ----
+      function reportBadge(d, done) {
+        if (done) return { text: "✓ Done", cls: "done" };
+        if (isNaN(d) || d === 0) return { text: "On Baseline", cls: "neutral" };
+        if (d > 0) return { text: "-" + d + "d Delay", cls: "delay" };
+        return { text: "+" + Math.abs(d) + "d Ahead", cls: "ahead" };
+      }
+
+      // Card markup for a single milestone. Completion never relocates a card out of its
+      // category — it just adds a green "COMPLETED" tag and a green accent on top of
+      // whatever variance badge would otherwise show.
+      function reportGridCardHTML(item) {
+        const badge = reportBadge(item.d, item.done);
+        return (
+          "" +
+          '<div class="report-card' +
+          (item.done ? " is-complete" : "") +
+          '">' +
+          (item.done
+            ? '<span class="report-card-complete-tag">✓ Completed</span>'
+            : "") +
+          '<div class="report-card-top">' +
+          '<span class="report-card-code">' +
+          item.code +
+          "</span>" +
+          '<span class="report-card-badge ' +
+          badge.cls +
+          '">' +
+          badge.text +
+          "</span>" +
+          "</div>" +
+          '<div class="report-card-title">' +
+          item.title +
+          "</div>" +
+          '<div class="report-card-dates">' +
+          "<span>Baseline: <b>" +
+          fmtSlash(item.baseline) +
+          "</b></span>" +
+          "<span>" +
+          (item.done ? "Actual" : "Forecast") +
+          ": <b>" +
+          fmtSlash(item.effective) +
+          "</b></span>" +
+          "</div>" +
+          "</div>"
+        );
+      }
+
+      // The four fixed report categories, in display order. Each maps to a data-group
+      // value set on the milestone nodes, and to the phase it belongs to (used for filtering).
+      const REPORT_GROUPS = [
+        { key: "core", title: "Completed", icon: "✓", phase: "p1" },
+        {
+          key: "p1access",
+          title: "Phase 1 Access &amp; Network",
+          icon: "🔌",
+          phase: "p1",
+        },
+        {
+          key: "p1completion",
+          title: "Phase 1 Completion",
+          icon: "🏗",
+          phase: "p1",
+        },
+        {
+          key: "p2baseline",
+          title: "Phase 2 Baseline",
+          icon: "📋",
+          phase: "p2",
+        },
+      ];
+
+      function reportGroupHTML(group, items) {
+        const cardsHtml = items.length
+          ? items.map(reportGridCardHTML).join("")
+          : '<div class="report-grid-empty">No milestones in this category.</div>';
+        return (
+          "" +
+          '<div class="report-group group-' +
+          group.key +
+          '">' +
+          '<div class="report-group-header">' +
+          '<span class="rg-title">' +
+          group.icon +
+          " " +
+          group.title +
+          "</span>" +
+          '<span class="rg-count">' +
+          items.length +
+          " Item" +
+          (items.length === 1 ? "" : "s") +
+          "</span>" +
+          "</div>" +
+          '<div class="report-group-body">' +
+          cardsHtml +
+          "</div>" +
+          "</div>"
+        );
+      }
+
+      // ---- OVERALL filter (All Milestones / Phase 01 / Phase 02) ----
+      let reportFilter = "all";
+      const reportChips = document.querySelectorAll(".report-filters .chip");
+      const reportScopeLabels = {
+        all: "All Milestones",
+        p1: "Phase 01",
+        p2: "Phase 02",
+      };
+      reportChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          reportChips.forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          reportFilter = chip.dataset.rfilter;
+          renderReport();
+        });
+      });
+
+      function renderReport() {
+        reorderTimeline();
+        const items = [];
+        document.querySelectorAll(".node[data-phase]").forEach((node) => {
+          const card = node.querySelector(".card");
+          const cb = card.querySelector(".complete-checkbox");
+          const baselineInput = card.querySelector(".baseline-input");
+          const forecastInput = card.querySelector(".forecast-input");
+          const completedInput = card.querySelector(".completed-input");
+          const baseline =
+            baselineInput.value || baselineInput.dataset.original;
+          const forecast =
+            forecastInput.value || forecastInput.dataset.original;
+          const done = cb.checked;
+          const effective = done ? completedInput.value || forecast : forecast;
+          const d = diffDays(baseline, effective);
+          items.push({
+            title: card.querySelector(".header-title").textContent,
+            code: card.querySelector(".meta b").textContent,
+            phase: node.dataset.phase,
+            group: node.dataset.group,
+            baseline,
+            forecast,
+            effective,
+            done,
+            d,
+          });
+        });
+
+        // Items already come out in chronological (sequential) order from reorderTimeline().
+        const scoped =
+          reportFilter === "all"
+            ? items
+            : items.filter((i) => i.phase === reportFilter);
+
+        document.getElementById("reportOverallScope").textContent =
+          reportScopeLabels[reportFilter];
+
+        // ---- Category sections ----
+        const grid = document.getElementById("reportGrid");
+        const visibleGroups = REPORT_GROUPS.filter(
+          (g) => reportFilter === "all" || g.phase === reportFilter,
+        );
+        grid.innerHTML = visibleGroups
+          .map((g) => {
+            const groupItems = scoped.filter((i) => i.group === g.key);
+            return reportGroupHTML(g, groupItems);
+          })
+          .join("");
+
+        // ---- Overall stats (recomputed against the scoped set) ----
+        const completed = scoped.filter((i) => i.done);
+        const atRisk = scoped.filter((i) => i.d > 0).sort((a, b) => b.d - a.d);
+        const p2Remaining = scoped.filter((i) => !i.done && i.phase === "p2");
+
+        // ---- NEW: Calculate days from latest completed card to next forecasted card ----
+        const lastCompletedIndex = scoped.reduce(
+          (lastIdx, item, idx) => (item.done ? idx : lastIdx),
+          -1,
+        );
+
+        // ---- Calculate days from TODAY to the next incomplete milestone ----
+        const todayInputEl = document.getElementById("todayDateInput");
+        const todayISO =
+          todayInputEl && todayInputEl.value
+            ? todayInputEl.value
+            : new Date().toISOString().split("T")[0];
+
+        // Find the immediate next incomplete milestone in the current scope
+        const nextMilestone = scoped.find((i) => !i.done && i.effective);
+
+        let daysToNextText = "--";
+        if (nextMilestone) {
+          const diff = diffDays(todayISO, nextMilestone.effective);
+          daysToNextText =
+            diff +
+            " day" +
+            (diff === 1 ? "" : "s") +
+            " before " +
+            nextMilestone.title;
+        }
+
+        // Update DOM Elements
+        document.getElementById("rsCompleted").textContent =
+          completed.length + " Milestone" + (completed.length === 1 ? "" : "s");
+
+        if (atRisk.length) {
+          const min = Math.min(...atRisk.map((i) => i.d));
+          const max = Math.max(...atRisk.map((i) => i.d));
+          document.getElementById("rsDelayed").innerHTML =
+            atRisk.length +
+            ' <span class="accent">(-' +
+            min +
+            "d to -" +
+            max +
+            "d)</span>";
+        } else {
+          document.getElementById("rsDelayed").textContent = "0 (On Baseline)";
+        }
+
+        if (scoped.length) {
+          const last = scoped[scoped.length - 1];
+          const fd = last.d;
+          const fv = formatVariance(fd);
+          document.getElementById("rsVariance").innerHTML =
+            (fd === 0
+              ? fv.text
+              : (fd > 0 ? "-" : "+") + Math.abs(fd) + " Days") +
+            ' <span class="accent" style="color:var(--muted); font-size:14px;">(' +
+            fmtShort(last.effective) +
+            ")</span>";
+        } else {
+          document.getElementById("rsVariance").textContent = "On baseline";
+        }
+
+        document.getElementById("rsPhase2").textContent =
+          p2Remaining.length + " Not Yet Complete";
+
+        // Update new stat element
+
+        const daysToNextEl = document.getElementById("rsDaysToNext");
+        if (daysToNextEl) {
+          daysToNextEl.innerHTML = daysToNextText;
+        }
+      }
+
+      // ---- Shared state: collect / apply / save / load ----
+      // Order in which milestones were last added, so a remote client can rebuild
+      // any it doesn't have yet in a stable, matching sequence.
+      function collectState() {
+        const milestones = {};
+        const order = [];
+        document.querySelectorAll(".node[data-phase]").forEach((node) => {
+          const card = node.querySelector(".card");
+          order.push(node.dataset.mkey);
+          milestones[node.dataset.mkey] = {
+            phase: node.dataset.phase,
+            group: node.dataset.group,
+            title: card.querySelector(".header-title").innerText,
+            code: card.querySelector(".meta b").innerText,
+            description: card.querySelector(".desc").innerText,
+            baseline: card.querySelector(".baseline-input").value,
+            forecast: card.querySelector(".forecast-input").value,
+            completed: card.querySelector(".completed-input").value,
+            checked: card.querySelector(".complete-checkbox").checked,
+            progress: card.querySelector(".progress-input")
+              ? card.querySelector(".progress-input").value
+              : "",
+          };
+        });
+        const footerEl = document.getElementById("footerText");
+        const texts = {
+          eyebrow: document.getElementById("projectEyebrow").innerText,
+          title: document.getElementById("pageTitle").innerText,
+          sub: document.getElementById("pageSub").innerText,
+          hint: document.getElementById("pageHint").innerText,
+          footer: footerEl ? footerEl.innerText : undefined,
+        };
+        return {
+          today: todayDateInput.value,
+          milestones,
+          milestoneOrder: order,
+          texts,
+          savedAt: new Date().toISOString(),
+        };
+      }
+
+      function applyCheckboxVisualState(card, checked) {
+        const statusEl = card.querySelector(".status");
+        const markerEl = card.closest(".node").querySelector(".marker");
+        const completedRow = card.querySelector(".completed-row");
+        if (checked) {
+          statusEl.textContent = "Complete";
+          statusEl.classList.add("done");
+          markerEl.classList.add("done");
+          completedRow.classList.add("show");
+        } else {
+          statusEl.textContent = "Upcoming";
+          statusEl.classList.remove("done");
+          markerEl.classList.remove("done");
+          completedRow.classList.remove("show");
+        }
+      }
+
+      let applyingRemoteState = false;
+      function applyState(state) {
+        if (!state) return;
+        applyingRemoteState = true;
+        if (state.today) todayDateInput.value = state.today;
+        if (state.texts) {
+          const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el && typeof val === "string" && document.activeElement !== el)
+              el.innerText = val;
+          };
+          setText("projectEyebrow", state.texts.eyebrow);
+          setText("pageTitle", state.texts.title);
+          setText("pageSub", state.texts.sub);
+          setText("pageHint", state.texts.hint);
+          setText("footerText", state.texts.footer);
+        }
+
+        // Milestones the remote state knows about that this browser hasn't rendered
+        // yet (e.g. someone else's "Add milestone") get created here, in the same
+        // order they were added, before values are applied below.
+        const order =
+          (state.milestoneOrder && state.milestoneOrder.length
+            ? state.milestoneOrder
+            : Object.keys(state.milestones || {})) || [];
+        order.forEach((mkey) => {
+          if (document.querySelector('.node[data-mkey="' + mkey + '"]')) return;
+          const m = state.milestones && state.milestones[mkey];
+          if (!m) return;
+          const node = insertMilestone({
+            mkey,
+            phase: m.phase,
+            group: m.group,
+            title: m.title || "Untitled milestone",
+            code: m.code,
+            description: m.description,
+            baseline: m.baseline,
+            forecast: m.forecast,
+            completed: m.completed,
+            checked: m.checked,
+            progress: m.progress,
+          });
+          const idx = parseInt(String(mkey).replace(/^m/, ""), 10);
+          if (!isNaN(idx) && idx >= nextMkeyIndex) nextMkeyIndex = idx + 1;
+        });
+
+        // Milestones this browser has rendered but that are no longer present in
+        // remote state (someone else deleted them) get removed here.
+        if (state.milestones) {
+          document.querySelectorAll(".node[data-phase]").forEach((node) => {
+            if (!state.milestones[node.dataset.mkey]) {
+              removeMilestoneNode(node);
+            }
+          });
+        }
+
+        document.querySelectorAll(".node[data-phase]").forEach((node) => {
+          const m = state.milestones && state.milestones[node.dataset.mkey];
+          if (!m) return;
+          const card = node.querySelector(".card");
+          const bi = card.querySelector(".baseline-input");
+          const fi = card.querySelector(".forecast-input");
+          const ci = card.querySelector(".completed-input");
+          bi.value = m.baseline || bi.dataset.original;
+          fi.value = m.forecast || fi.dataset.original;
+          ci.value = m.completed || "";
+          const cb = card.querySelector(".complete-checkbox");
+          cb.checked = !!m.checked;
+          applyCheckboxVisualState(card, cb.checked);
+          const pi = card.querySelector(".progress-input");
+          if (pi && document.activeElement !== pi)
+            pi.value = m.progress != null ? m.progress : "";
+          updateProgressUI(card);
+
+          const titleEl = card.querySelector(".header-title");
+          if (typeof m.title === "string" && document.activeElement !== titleEl)
+            titleEl.innerText = m.title;
+          const descEl = card.querySelector(".desc");
+          if (
+            typeof m.description === "string" &&
+            document.activeElement !== descEl
+          )
+            descEl.innerText = m.description;
+          const codeEl = card.querySelector(".meta b");
+          if (typeof m.code === "string" && document.activeElement !== codeEl)
+            codeEl.innerText = m.code;
+        });
+        document.querySelectorAll(".card").forEach(updateRow);
+        updateOverall();
+        updateCompletedCount();
+        updateTodayBadge();
+        applyingRemoteState = false;
+      }
+
+      let saveTimer = null;
+      function scheduleSave() {
+        if (!firebaseDb || applyingRemoteState) return;
+        setSyncStatus("saving", "Saving…");
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          firebaseDb
+            .collection(DOC_PATH.collection)
+            .doc(DOC_PATH.doc)
+            .set(collectState())
+            .then(() => setSyncStatus("synced", "Synced"))
+            .catch((err) => {
+              console.error("Save failed:", err);
+              setSyncStatus(
+                "error",
+                err && err.code === "permission-denied"
+                  ? "Save blocked (check rules)"
+                  : "Save failed",
+              );
+            });
+        }, 500);
+      }
+
+      function initSharedState() {
+        if (!firebaseDb) return;
+        setSyncStatus("connecting", "Connecting…");
+        const ref = firebaseDb
+          .collection(DOC_PATH.collection)
+          .doc(DOC_PATH.doc);
+        ref
+          .get()
+          .then((snap) => {
+            if (snap.exists) {
+              applyState(snap.data());
+              setSyncStatus("synced", "Synced");
+            } else {
+              scheduleSave(); // seed the doc with current defaults
+            }
+          })
+          .catch((err) => {
+            console.error("Load failed:", err);
+            setSyncStatus(
+              "error",
+              err && err.code === "permission-denied"
+                ? "Blocked (check rules)"
+                : "Connection error",
+            );
+          });
+        ref.onSnapshot(
+          (snap) => {
+            if (snap.exists) {
+              applyState(snap.data());
+              setSyncStatus("synced", "Synced");
+            }
+          },
+          (err) => {
+            console.error("Realtime listener error:", err);
+            setSyncStatus(
+              "error",
+              err && err.code === "permission-denied"
+                ? "Blocked (check rules)"
+                : "Connection error",
+            );
+          },
+        );
+      }
+
+      function initEditableTextSync() {
+        [
+          "projectEyebrow",
+          "pageTitle",
+          "pageSub",
+          "pageHint",
+          "footerText",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener("input", scheduleSave);
+        });
+        // Keep the eyebrow and title as single-line fields
+        ["projectEyebrow", "pageTitle"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") e.preventDefault();
+          });
+        });
+
+        // Per-milestone title & description on the cards rendered at page load
+        // (cards added later are wired individually by wireMilestoneCard).
+        // Only scheduleSave here — NOT updateRow/renderReport, which reorder
+        // the whole timeline and would knock focus out of the field mid-type.
+        // The report tab re-reads title/description text live whenever it's
+        // actually rendered (tab switch, a date edit, etc.), so it stays in sync.
+        document
+          .querySelectorAll(".header-title.editable-text, .desc.editable-text")
+          .forEach((el) => {
+            el.addEventListener("input", () => {
+              scheduleSave();
+            });
+          });
+        document
+          .querySelectorAll(".header-title.editable-text")
+          .forEach((el) => {
+            el.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") e.preventDefault();
+            });
+          });
+      }
+
+      // ---- Reset ----
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        document
+          .querySelectorAll(
+            ".baseline-input, .forecast-input, .completed-input",
+          )
+          .forEach((input) => {
+            input.value = input.dataset.original;
+          });
+        document.querySelectorAll(".complete-checkbox").forEach((cb) => {
+          const shouldCheck = cb.dataset.originalChecked === "true";
+          if (cb.checked !== shouldCheck) {
+            cb.checked = shouldCheck;
+            cb.dispatchEvent(new Event("change"));
+          }
+        });
+        document.querySelectorAll(".card").forEach(updateRow);
+        updateOverall();
+        updateCompletedCount();
+        scheduleSave();
+      });
+
+      // ---- Today control ----
+      const todayDateInput = document.getElementById("todayDateInput");
+      const todayControlBadge = document.getElementById("todayControlBadge");
+      const todayPillTimeline = document.getElementById("todayPillTimeline");
+
+      function updateTodayBadge() {
+        const iso = todayDateInput.value;
+        if (!iso) return;
+        const text = "CUT OFF · " + fmtPillUpper(iso);
+        todayControlBadge.textContent = text;
+        if (todayPillTimeline) todayPillTimeline.textContent = text;
+        const liveLabel = document.getElementById("reportLiveLabel");
+        if (liveLabel)
+          liveLabel.textContent = "LIVE AS OF " + fmtPillUpper(iso);
+        reorderTimeline();
+      }
+      todayDateInput.addEventListener("change", () => {
+        updateTodayBadge();
+        scheduleSave();
+      });
+
+      function initToday() {
+        const now = new Date();
+        const iso =
+          now.getFullYear() +
+          "-" +
+          String(now.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(now.getDate()).padStart(2, "0");
+        todayDateInput.value = iso;
+        updateTodayBadge();
+      }
+
+      // ---- Init ----
+      initToday();
+      document.querySelectorAll(".card").forEach(updateHeaderDate);
+      document.querySelectorAll(".card").forEach(updateProgressUI);
+      updateCompletedCount();
+      renderReport();
+      initEditLock();
+      initEditableTextSync();
+      initAddMilestoneModal();
+      initSharedState(); // pulls the last shared edit, if Firebase is configured (see top of script)
+    </script>
+  </body>
+</html>
