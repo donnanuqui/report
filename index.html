@@ -428,7 +428,7 @@
         font-weight: 800;
         font-size: 22px;
         text-transform: uppercase;
-        letter-spacing: 0.01em;
+        letter-spacing: 1px;
         color: var(--ink);
         margin: 0 0 4px;
       }
@@ -597,7 +597,7 @@
 
       .gap-label {
         font-family: "IBM Plex Mono", monospace;
-        font-size: 14px;
+        font-size: 11.5px;
         color: var(--muted);
         margin: 4px 0 12px 2px;
       }
@@ -1223,7 +1223,7 @@
         font-family: "Barlow Condensed", sans-serif;
         font-weight: 700;
         font-size: 16px;
-        letter-spacing: 0.03em;
+        letter-spacing: 1px;
         text-transform: uppercase;
         margin-right: auto;
         display: flex;
@@ -1326,7 +1326,7 @@
       }
       .report-card-code {
         font-family: "IBM Plex Mono", monospace;
-        font-size: 12px;
+        font-size: 9.5px;
         color: var(--muted);
         background: #eef0f2;
         padding: 2px 7px;
@@ -1362,6 +1362,7 @@
         font-size: 16px;
         color: var(--ink);
         margin-bottom: 6px;
+        letter-spacing: 1px;
       }
       .report-card-dates {
         display: flex;
@@ -1447,7 +1448,8 @@
         </button>
       </div>
       <div class="view-only-banner" id="viewOnlyBanner">
-        You're viewing a read-only copy.
+        You're viewing a read-only copy. Click "Enable editing" above and enter
+        the passphrase to make changes.
       </div>
 
       <header>
@@ -3144,8 +3146,20 @@
             <div class="report-stat">
               <span class="report-stat-icon ok">✓</span>
               <div>
-                <div class="report-stat-label">Completed</div>
-                <div class="report-stat-value" id="rsCompleted">
+                <div
+                  class="report-stat-label editable-text"
+                  id="rsLabelCompleted"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  Completed
+                </div>
+                <div
+                  class="report-stat-value editable-text"
+                  id="rsCompleted"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
                   0 Milestones
                 </div>
               </div>
@@ -3153,22 +3167,62 @@
             <div class="report-stat">
               <span class="report-stat-icon warn">!</span>
               <div>
-                <div class="report-stat-label">Delayed Milestones</div>
-                <div class="report-stat-value" id="rsDelayed">0</div>
+                <div
+                  class="report-stat-label editable-text"
+                  id="rsLabelDelayed"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  Delayed Milestones
+                </div>
+                <div
+                  class="report-stat-value editable-text"
+                  id="rsDelayed"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  0
+                </div>
               </div>
             </div>
             <div class="report-stat">
               <span class="report-stat-icon flag">⚑</span>
               <div>
-                <div class="report-stat-label">Final Variance</div>
-                <div class="report-stat-value" id="rsVariance">On baseline</div>
+                <div
+                  class="report-stat-label editable-text"
+                  id="rsLabelVariance"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  Final Variance
+                </div>
+                <div
+                  class="report-stat-value editable-text"
+                  id="rsVariance"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  On baseline
+                </div>
               </div>
             </div>
             <div class="report-stat">
               <span class="report-stat-icon info">▤</span>
               <div>
-                <div class="report-stat-label">Phase 2 Status</div>
-                <div class="report-stat-value" id="rsPhase2">
+                <div
+                  class="report-stat-label editable-text"
+                  id="rsLabelPhase2"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
+                  Phase 2 Status
+                </div>
+                <div
+                  class="report-stat-value editable-text"
+                  id="rsPhase2"
+                  contenteditable="true"
+                  spellcheck="false"
+                >
                   0 Not Yet Complete
                 </div>
               </div>
@@ -4437,10 +4491,23 @@
         },
       ];
 
+      // User-editable overrides for each group's title (null = use the default
+      // title above). Synced via collectState/applyState like the other texts.
+      const reportGroupTitleOverrides = {
+        core: null,
+        p1access: null,
+        p1completion: null,
+        p2baseline: null,
+      };
+
       function reportGroupHTML(group, items) {
         const cardsHtml = items.length
           ? items.map(reportGridCardHTML).join("")
           : '<div class="report-grid-empty">No milestones in this category.</div>';
+        const titleText =
+          reportGroupTitleOverrides[group.key] != null
+            ? reportGroupTitleOverrides[group.key]
+            : group.title.replace(/&amp;/g, "&");
         return (
           "" +
           '<div class="report-group group-' +
@@ -4450,7 +4517,11 @@
           '<span class="rg-title">' +
           group.icon +
           " " +
-          group.title +
+          '<span class="rg-title-text editable-text" data-gkey="' +
+          group.key +
+          '" contenteditable="true" spellcheck="false">' +
+          escapeHtml(titleText) +
+          "</span>" +
           "</span>" +
           '<span class="rg-count">' +
           items.length +
@@ -4525,12 +4596,27 @@
         const visibleGroups = REPORT_GROUPS.filter(
           (g) => reportFilter === "all" || g.phase === reportFilter,
         );
-        grid.innerHTML = visibleGroups
-          .map((g) => {
-            const groupItems = scoped.filter((i) => i.group === g.key);
-            return reportGroupHTML(g, groupItems);
-          })
-          .join("");
+        // Skip rebuilding the grid while the user is mid-edit on a group title —
+        // rebuilding replaces that element outright and would knock out their
+        // cursor and unsaved keystrokes.
+        const editingGroupTitle =
+          document.activeElement &&
+          document.activeElement.classList &&
+          document.activeElement.classList.contains("rg-title-text") &&
+          grid.contains(document.activeElement);
+        if (!editingGroupTitle) {
+          grid.innerHTML = visibleGroups
+            .map((g) => {
+              const groupItems = scoped.filter((i) => i.group === g.key);
+              return reportGroupHTML(g, groupItems);
+            })
+            .join("");
+          // Freshly built title/label spans need the current lock state applied,
+          // same as newly inserted milestone cards.
+          if (typeof setEditLock === "function") {
+            setEditLock(document.body.classList.contains("locked-view"));
+          }
+        }
 
         // ---- Overall stats (recomputed against the scoped set) ----
         const completed = scoped.filter((i) => i.done);
@@ -4565,40 +4651,57 @@
         }
 
         // Update DOM Elements
-        document.getElementById("rsCompleted").textContent =
-          completed.length + " Milestone" + (completed.length === 1 ? "" : "s");
-
-        if (atRisk.length) {
-          const min = Math.min(...atRisk.map((i) => i.d));
-          const max = Math.max(...atRisk.map((i) => i.d));
-          document.getElementById("rsDelayed").innerHTML =
-            atRisk.length +
-            ' <span class="accent">(-' +
-            min +
-            "d to -" +
-            max +
-            "d)</span>";
-        } else {
-          document.getElementById("rsDelayed").textContent = "0 (On Baseline)";
+        // Each stat value is skipped here if the user has typed a manual
+        // override into it directly — see the input handler in
+        // initEditableTextSync, which sets dataset.override. Clearing the
+        // field back to empty removes the override and resumes auto-calc.
+        const rsCompletedEl = document.getElementById("rsCompleted");
+        if (rsCompletedEl && rsCompletedEl.dataset.override !== "1") {
+          rsCompletedEl.textContent =
+            completed.length +
+            " Milestone" +
+            (completed.length === 1 ? "" : "s");
         }
 
-        if (scoped.length) {
-          const last = scoped[scoped.length - 1];
-          const fd = last.d;
-          const fv = formatVariance(fd);
-          document.getElementById("rsVariance").innerHTML =
-            (fd === 0
-              ? fv.text
-              : (fd > 0 ? "-" : "+") + Math.abs(fd) + " Days") +
-            ' <span class="accent" style="color:var(--muted); font-size:14px;">(' +
-            fmtShort(last.effective) +
-            ")</span>";
-        } else {
-          document.getElementById("rsVariance").textContent = "On baseline";
+        const rsDelayedEl = document.getElementById("rsDelayed");
+        if (rsDelayedEl && rsDelayedEl.dataset.override !== "1") {
+          if (atRisk.length) {
+            const min = Math.min(...atRisk.map((i) => i.d));
+            const max = Math.max(...atRisk.map((i) => i.d));
+            rsDelayedEl.innerHTML =
+              atRisk.length +
+              ' <span class="accent">(-' +
+              min +
+              "d to -" +
+              max +
+              "d)</span>";
+          } else {
+            rsDelayedEl.textContent = "0 (On Baseline)";
+          }
         }
 
-        document.getElementById("rsPhase2").textContent =
-          p2Remaining.length + " Not Yet Complete";
+        const rsVarianceEl = document.getElementById("rsVariance");
+        if (rsVarianceEl && rsVarianceEl.dataset.override !== "1") {
+          if (scoped.length) {
+            const last = scoped[scoped.length - 1];
+            const fd = last.d;
+            const fv = formatVariance(fd);
+            rsVarianceEl.innerHTML =
+              (fd === 0
+                ? fv.text
+                : (fd > 0 ? "-" : "+") + Math.abs(fd) + " Days") +
+              ' <span class="accent" style="color:var(--muted); font-size:14px;">(' +
+              fmtShort(last.effective) +
+              ")</span>";
+          } else {
+            rsVarianceEl.textContent = "On baseline";
+          }
+        }
+
+        const rsPhase2El = document.getElementById("rsPhase2");
+        if (rsPhase2El && rsPhase2El.dataset.override !== "1") {
+          rsPhase2El.textContent = p2Remaining.length + " Not Yet Complete";
+        }
 
         // Update new stat element
 
@@ -4633,12 +4736,29 @@
           };
         });
         const footerEl = document.getElementById("footerText");
+        const getVal = (id) => {
+          const el = document.getElementById(id);
+          return el ? el.innerText : undefined;
+        };
+        const getOverride = (id) => {
+          const el = document.getElementById(id);
+          return el && el.dataset.override === "1" ? el.innerText : null;
+        };
         const texts = {
           eyebrow: document.getElementById("projectEyebrow").innerText,
           title: document.getElementById("pageTitle").innerText,
           sub: document.getElementById("pageSub").innerText,
           hint: document.getElementById("pageHint").innerText,
           footer: footerEl ? footerEl.innerText : undefined,
+          labelCompleted: getVal("rsLabelCompleted"),
+          labelDelayed: getVal("rsLabelDelayed"),
+          labelVariance: getVal("rsLabelVariance"),
+          labelPhase2: getVal("rsLabelPhase2"),
+          statCompletedOverride: getOverride("rsCompleted"),
+          statDelayedOverride: getOverride("rsDelayed"),
+          statVarianceOverride: getOverride("rsVariance"),
+          statPhase2Override: getOverride("rsPhase2"),
+          groupTitles: { ...reportGroupTitleOverrides },
         };
         return {
           today: todayDateInput.value,
@@ -4682,6 +4802,36 @@
           setText("pageSub", state.texts.sub);
           setText("pageHint", state.texts.hint);
           setText("footerText", state.texts.footer);
+          setText("rsLabelCompleted", state.texts.labelCompleted);
+          setText("rsLabelDelayed", state.texts.labelDelayed);
+          setText("rsLabelVariance", state.texts.labelVariance);
+          setText("rsLabelPhase2", state.texts.labelPhase2);
+
+          // Report stat manual overrides: a string means the user overrode the
+          // auto-calculated value; null/undefined means auto-calc still owns it.
+          const setStatOverride = (id, val) => {
+            const el = document.getElementById(id);
+            if (!el || document.activeElement === el) return;
+            if (typeof val === "string") {
+              el.innerText = val;
+              el.dataset.override = "1";
+            } else {
+              delete el.dataset.override;
+            }
+          };
+          setStatOverride("rsCompleted", state.texts.statCompletedOverride);
+          setStatOverride("rsDelayed", state.texts.statDelayedOverride);
+          setStatOverride("rsVariance", state.texts.statVarianceOverride);
+          setStatOverride("rsPhase2", state.texts.statPhase2Override);
+
+          if (state.texts.groupTitles) {
+            Object.keys(reportGroupTitleOverrides).forEach((key) => {
+              reportGroupTitleOverrides[key] =
+                typeof state.texts.groupTitles[key] === "string"
+                  ? state.texts.groupTitles[key]
+                  : null;
+            });
+          }
         }
 
         // Milestones the remote state knows about that this browser hasn't rendered
@@ -4834,19 +4984,76 @@
           "pageSub",
           "pageHint",
           "footerText",
+          "rsLabelCompleted",
+          "rsLabelDelayed",
+          "rsLabelVariance",
+          "rsLabelPhase2",
         ].forEach((id) => {
           const el = document.getElementById(id);
           if (!el) return;
           el.addEventListener("input", scheduleSave);
         });
-        // Keep the eyebrow and title as single-line fields
-        ["projectEyebrow", "pageTitle"].forEach((id) => {
+        // Keep the eyebrow, title, and the report stat labels as single-line fields
+        [
+          "projectEyebrow",
+          "pageTitle",
+          "rsLabelCompleted",
+          "rsLabelDelayed",
+          "rsLabelVariance",
+          "rsLabelPhase2",
+        ].forEach((id) => {
           const el = document.getElementById(id);
           if (!el) return;
           el.addEventListener("keydown", (e) => {
             if (e.key === "Enter") e.preventDefault();
           });
         });
+
+        // Report stat values (rsCompleted, rsDelayed, rsVariance, rsPhase2) are
+        // normally auto-calculated by renderReport(). Typing into one marks it
+        // as a manual override so the calculation stops touching it; clearing
+        // the field back to empty removes the override and restores auto-calc.
+        ["rsCompleted", "rsDelayed", "rsVariance", "rsPhase2"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") e.preventDefault();
+          });
+          el.addEventListener("input", () => {
+            if (el.textContent.trim() === "") {
+              delete el.dataset.override;
+              refreshTimelineStats();
+            } else {
+              el.dataset.override = "1";
+            }
+            scheduleSave();
+          });
+        });
+
+        // Report group titles (rg-title-text) are rebuilt inside #reportGrid on
+        // every renderReport() call, so listeners are delegated on the
+        // persistent grid container rather than re-wired per rebuild.
+        const grid = document.getElementById("reportGrid");
+        if (grid) {
+          grid.addEventListener("input", (e) => {
+            const el = e.target;
+            if (!el.classList || !el.classList.contains("rg-title-text"))
+              return;
+            const gkey = el.dataset.gkey;
+            if (!gkey) return;
+            reportGroupTitleOverrides[gkey] = el.textContent;
+            scheduleSave();
+          });
+          grid.addEventListener("keydown", (e) => {
+            if (
+              e.key === "Enter" &&
+              e.target.classList &&
+              e.target.classList.contains("rg-title-text")
+            ) {
+              e.preventDefault();
+            }
+          });
+        }
 
         // Per-milestone title & description on the cards rendered at page load
         // (cards added later are wired individually by wireMilestoneCard).
