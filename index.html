@@ -4429,8 +4429,16 @@
         const card = node.querySelector(".card");
         updateHeaderDate(card);
         updateRow(card);
+        // Respect whichever phase filter is currently active, so a milestone
+        // added while filtered to e.g. Phase 02 doesn't show up under Phase 01.
+        if (typeof timelineFilter !== "undefined" && timelineFilter !== "all") {
+          node.style.display = node.dataset.phase === timelineFilter ? "" : "none";
+        }
         reorderTimeline();
         refreshTimelineStats();
+        if (typeof timelineFilter !== "undefined" && timelineFilter !== "all") {
+          refreshGapLabelVisibility(timelineFilter);
+        }
         renderReport();
         return node;
       }
@@ -4581,9 +4589,13 @@
       // (.report-filters .chip) with a separate handler further down; a global ".chip"
       // selector here would attach this handler to those too and break the Timeline view.
       const chips = document.querySelectorAll(".filters .chip");
-      const filterables = document.querySelectorAll(
-        ".node, .phase-header, .today-row",
-      );
+      // NOTE: re-queried fresh on every filter click (see chips.forEach below)
+      // rather than captured once here — a one-time querySelectorAll snapshot
+      // would miss any .node added later via insertMilestone(), which is why
+      // newly-added milestones used to ignore the active phase filter.
+      function getFilterables() {
+        return document.querySelectorAll(".node, .phase-header, .today-row");
+      }
       let timelineFilter = "all";
 
       // A gap-label describes the interval between the two milestone nodes it sits
@@ -4686,7 +4698,7 @@
           chip.classList.add("active");
           const f = chip.dataset.filter;
           timelineFilter = f;
-          filterables.forEach((n) => {
+          getFilterables().forEach((n) => {
             if (f === "all") {
               n.style.display = "";
               return;
